@@ -1,0 +1,68 @@
+import { executarComandoSQL } from "../database/mysql";
+import { User } from "../model/classes/user";
+
+export class UserRepository {
+    private static instance: UserRepository;
+
+    private constructor(){
+        this.createTable();
+    }
+
+    public static getInstance(): UserRepository {
+        if(!this.instance){
+            this.instance = new UserRepository();
+        }
+        return this.instance
+    }
+
+    private async createTable(){
+        const query = `
+        CREATE TABLE IF NOT EXISTS room_reservation.Users
+        (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            nome VARCHAR(255) NOT NULL,
+            email VARCHAR(255) NOT NULL,
+            curso VARCHAR(255) NOT NULL,
+            senha VARCHAR(255) NOT NULL,
+            tipo VARCHAR(255) NOT NULL
+        )`;
+
+        try {
+            const resultado = await executarComandoSQL(query, []);
+            console.log('Query  executada com sucesso: ', resultado);
+        } catch (err) {
+            console.error('Error');
+        }
+    }
+
+    async insereUsuario(user: User): Promise<User> {
+        const query = "INSERT INTO room_reservation.Users(nome, email, curso, senha, tipo) VALUES (?,?,?,?,?)"
+
+        try {
+            const resultado = await executarComandoSQL(query, [user.nome, user.email, user.curso, user.senha, user.tipo])
+            console.log('Usuario cadastrado com sucesso');
+            user.id = resultado.insertId;
+            return new Promise<User>((resolve) => {
+                resolve(user);
+            })
+        } catch (err:any) {
+            console.error('Erro ao cadastrar Usuário: ', err);
+            throw err;
+        }
+    }
+
+    async filtraUsuarioById(id?:number):Promise<User[]> {
+        let query = "SELECT * FROM room_reservation.Users where id = ?";
+
+        try {
+            const resultado = await executarComandoSQL(query, [id]);
+            console.log('Busca efetuada com sucesso: ', resultado);
+            return new Promise<User[]>((resolve) => {
+                resolve(resultado)
+            })
+        } catch (err:any){
+            console.error(`Falha ao procurar usuario gerando o erro: ${err}`)
+            throw err;
+        }
+    }
+}

@@ -8,8 +8,9 @@ export class Coordenador extends User {
         nome?: string,
         email?: string,
         curso?: string,
-        senha?: string
+        senha?: string,
+        tipo?: string
     ) {
-        super(id, nome, email, curso, senha)
+        super(id, nome, email, curso, senha, tipo)
     }
 }
