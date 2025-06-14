@@ -45,6 +45,7 @@ cp .env.example .env
 ```bash
 docker compose up -d
 ```
+**OBS:** O Docker Desktop deve estar aberto
 
 O projeto estará disponível em:
 - Frontend: http://localhost:3000
