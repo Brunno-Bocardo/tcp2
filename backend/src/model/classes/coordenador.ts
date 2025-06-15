@@ -1,16 +1,24 @@
-import { User } from "./user";
+import { User } from "../interfaces/user";
 
+export class Coordenador implements User {
+  id: number;
+  nome: string;
+  email: string;
+  curso: string;
+  senha: string;
+  tipo: string = "Coordenador";
 
-export class Coordenador extends User {
-    tipo: string = 'Coordenador';
-    
-    constructor(
-        id?: number,
-        nome?: string,
-        email?: string,
-        curso?: string,
-        senha?: string,
-    ) {
-        super(id, nome, email, curso, senha)
-    }
+  constructor(
+    id?: number,
+    nome?: string,
+    email?: string,
+    curso?: string,
+    senha?: string
+  ) {
+    this.id = id || 0;
+    this.nome = nome || "";
+    this.email = email || "";
+    this.curso = curso || "";
+    this.senha = senha || "";
+  }
 }
