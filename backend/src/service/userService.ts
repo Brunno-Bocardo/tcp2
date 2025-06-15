@@ -25,4 +25,16 @@ export class UserService {
       resolve(novoUser);
     });
   }
+
+  // async verificarUsuario(userData:any): Promise<User> {
+  //   const {nome, senha} = userData;
+
+  //   const bancoUser = await this.UsuarioRepository.filtraUsuarioByName(nome);
+    
+  //   if(bancoUser.senha == senha){
+
+  //   }
+
+  // }
+
 }

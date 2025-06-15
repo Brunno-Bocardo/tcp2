@@ -72,4 +72,19 @@ export class UserRepository {
       throw err;
     }
   }
+
+  async filtraUsuarioByName(name?: number): Promise<User> {
+    let query = "SELECT * FROM room_reservation.Users where nome = ?";
+
+    try {
+      const resultado = await executarComandoSQL(query, [name]);
+      console.log("Busca efetuada com sucesso: ", resultado);
+      return new Promise<User>((resolve) => {
+        resolve(resultado);
+      });
+    } catch (err: any) {
+      console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
+      throw err;
+    }
+  }
 }

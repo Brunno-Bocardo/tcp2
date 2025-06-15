@@ -16,3 +16,16 @@ export function cadastrarUsuario(req: Request, res: Response){
         res.status(400).json({message:error.message})
     }
 };
+
+// export function verificarUsuario(req:Request, res:Response){
+//     try{
+//         const userData = UsuarioService.verificarUsuario(req.body)
+//         res.status(201).json(
+//             {
+//                 mensagem: "Usuario verificado com sucesso!"
+//             }
+//         )
+//     } catch(error:any){
+//         res.status(400).json({message:error.message})
+//     }
+// }
