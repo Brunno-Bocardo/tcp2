@@ -1,6 +1,6 @@
-import { Professor } from "../classes/professor";
-import { User } from "../interfaces/user";
-import { UserFactory } from "../abstractFactory/userFactory";
+import { Professor } from "../classes/Professor";
+import { User } from "../interfaces/IUser";
+import { UserFactory } from "./IUserFactory";
 
 export class ProfessorFactory implements UserFactory {
   criarUsuario(

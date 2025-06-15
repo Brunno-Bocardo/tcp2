@@ -1,8 +1,8 @@
-import { CoordenadorFactory } from "../model/abstractFactory/coordenadorFactory";
-import { ProfessorFactory } from "../model/abstractFactory/professorFactory";
-import { Coordenador } from "../model/classes/coordenador";
-import { Professor } from "../model/classes/professor";
-import { User } from "../model/interfaces/user";
+import { CoordenadorFactory } from "../model/abstractFactory/CoordenadorFactory";
+import { ProfessorFactory } from "../model/abstractFactory/ProfessorFactory";
+import { Coordenador } from "../model/classes/Coordenador";
+import { Professor } from "../model/classes/Professor";
+import { User } from "../model/interfaces/IUser";
 import { UserRepository } from "../repository/userRepository";
 
 export class UserService {
@@ -14,8 +14,11 @@ export class UserService {
     const { nome, email, curso, senha, tipo } = userData;
 
     // Aplicando abstract factory
-    const usuario = tipo == "Coordenador" ? this.coordenadorFabrica.criarUsuario(nome, email, curso, senha) : this.professorFabrica.criarUsuario(nome, email, curso, senha)
-    
+    const usuario =
+      tipo == "Coordenador"
+        ? this.coordenadorFabrica.criarUsuario(nome, email, curso, senha)
+        : this.professorFabrica.criarUsuario(nome, email, curso, senha);
+
     const novoUser = await this.UsuarioRepository.inserirUsuario(usuario);
     console.log("Cadastrado: ", novoUser);
     return new Promise<User>((resolve) => {

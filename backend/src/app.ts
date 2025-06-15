@@ -1,40 +1,42 @@
-import express, { Request, Response } from 'express';
-import cors from 'cors';
-import { jsonParaXmlAdapter } from './service/adapter';
-import { IReserva } from './model/interfaces/ireserva';
+import express, { Request, Response } from "express";
+import cors from "cors";
+import { jsonParaXmlAdapter } from "./service/adapter";
+import { IReserva } from "./model/interfaces/IReserva";
 
 const app = express();
 const PORT = process.env.PORT ?? 5000;
 
 // CONFIGURA CORS PRA PERMITIR O FRONT
-app.use(cors({
-    origin: 'http://localhost:3000'
-}));
+app.use(
+  cors({
+    origin: "http://localhost:3000",
+  })
+);
 
 // HABILITA JSON NO BODY
 app.use(express.json());
 
 // SIMULA O BACKEND LEGADO QUE TRABALHA COM XML
 function backendLegado(xml: string) {
-    console.log('[BACKEND LEGADO RECEBENDO XML]:\n', xml);
+  console.log("[BACKEND LEGADO RECEBENDO XML]:\n", xml);
 }
 
 // ENDPOINT DE RESERVA
-app.post('/api/reserva', (req: Request, res: Response) => {       
-    const dados: IReserva = req.body;                       // <- OBJETO TRANSACIONAL EM JSON
-    console.log('[JSON RECEBIDO]:', dados);
+app.post("/api/reserva", (req: Request, res: Response) => {
+  const dados: IReserva = req.body; // <- OBJETO TRANSACIONAL EM JSON
+  console.log("[JSON RECEBIDO]:", dados);
 
-    const xml = jsonParaXmlAdapter(dados);                  // <- AQUI O ADAPTER AGE
+  const xml = jsonParaXmlAdapter(dados); // <- AQUI O ADAPTER AGE
 
-    backendLegado(xml);
+  backendLegado(xml);
 
-    res.json({
-        status: 'sucesso',
-        xml_enviado: xml
-    });
+  res.json({
+    status: "sucesso",
+    xml_enviado: xml,
+  });
 });
 
 // SERVER AQ
 app.listen(PORT, () => {
-    console.log(`API EXECUTANDO NA URL: http://localhost:${PORT}`);
+  console.log(`API EXECUTANDO NA URL: http://localhost:${PORT}`);
 });

@@ -1,6 +1,6 @@
-import { Coordenador } from "../classes/coordenador";
-import { User } from "../interfaces/user";
-import { UserFactory } from "../abstractFactory/userFactory";
+import { User } from "../interfaces/IUser";
+import { UserFactory } from "./IUserFactory";
+import { Coordenador } from "../classes/Coordenador";
 
 export class CoordenadorFactory implements UserFactory {
   criarUsuario(
@@ -9,6 +9,6 @@ export class CoordenadorFactory implements UserFactory {
     curso: string,
     senha: string
   ): User {
-    return new Coordenador(undefined, nome, email, curso, senha);
+    return new Coordenador();
   }
 }

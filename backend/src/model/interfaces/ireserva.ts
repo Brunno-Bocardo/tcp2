@@ -1,5 +1,5 @@
-import { Sala } from "./sala";
-import { User } from "./user";
+import { Sala } from "./ISala";
+import { User } from "./IUser";
 
 export interface IReserva {
   sala: Sala;

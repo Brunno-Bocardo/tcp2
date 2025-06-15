@@ -1,5 +1,5 @@
 import { executarComandoSQL } from "../database/mysql";
-import { User } from "../model/interfaces/user";
+import { User } from "../model/interfaces/IUser";
 
 export class UserRepository {
   private static instance: UserRepository;

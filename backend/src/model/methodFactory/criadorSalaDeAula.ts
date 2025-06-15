@@ -1,6 +1,6 @@
-import { SalaDeAula } from "../classes/salaDeAula";
-import { Sala } from "../interfaces/sala";
-import { CriadorSala } from "./criadorSala";
+import { SalaDeAula } from "../classes/SalaDeAula";
+import { Sala } from "../interfaces/ISala";
+import { CriadorSala } from "./CriadorSala";
 
 export class CriadorSalaDeAula extends CriadorSala {
   public criarSala(numeroSala: number, capacidadeMaxima: number): Sala {
