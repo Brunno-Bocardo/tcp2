@@ -15,7 +15,7 @@ Este sistema permite o gerenciamento de reservas de diferentes tipos de salas (A
 ### Padrões de Projeto Implementados
 
 - **Adapter**: Converte requisições JSON do frontend para XML (sistema legado)
-- **Factory**: Criação de diferentes tipos de salas
+- **Factory Method**: Criação de diferentes tipos de salas
 - **Singleton**: Gerenciamento de conexão com banco de dados
 -
 -

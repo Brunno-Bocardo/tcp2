@@ -2,6 +2,7 @@ import { User } from "./user";
 
 
 export class Coordenador extends User {
+    tipo: string = 'Coordenador';
     
     constructor(
         id?: number,
@@ -9,8 +10,7 @@ export class Coordenador extends User {
         email?: string,
         curso?: string,
         senha?: string,
-        tipo?: string
     ) {
-        super(id, nome, email, curso, senha, tipo)
+        super(id, nome, email, curso, senha)
     }
 }
