@@ -13,15 +13,16 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.5.0",
     "express": "^5.1.0",
-    "mysql2": "^3.14.1",
-    "cors": "^2.8.5"
+    "mysql2": "^3.14.1"
   },
   "devDependencies": {
+    "@types/cors": "^2.8.12",
     "@types/express": "^5.0.2",
     "@types/node": "^22.15.29",
-    "@types/cors": "^2.8.12",
     "ts-node-dev": "^2.0.0",
     "typescript": "^5.8.3"
   }

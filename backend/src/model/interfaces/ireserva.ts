@@ -4,7 +4,8 @@ import { User } from "./IUser";
 export interface IReserva {
   sala: Sala;
   usuario: User;
+  dataSolicitacao: string;
   dia: string;
-  horario: string;
-  data_da_solicitacao: string;
+  horarioInicio: string;
+  horarioFim: string;
 }

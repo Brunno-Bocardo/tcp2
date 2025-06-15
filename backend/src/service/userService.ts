@@ -7,8 +7,8 @@ import { UserRepository } from "../repository/userRepository";
 
 export class UserService {
   private UsuarioRepository = UserRepository.getInstance();
-  coordenadorFabrica = new CoordenadorFactory();
-  professorFabrica = new ProfessorFactory();
+  private coordenadorFabrica = new CoordenadorFactory();
+  private professorFabrica = new ProfessorFactory();
 
   async cadastrarUsuario(userData: any): Promise<User> {
     const { nome, email, curso, senha, tipo } = userData;

@@ -29,7 +29,7 @@ export class UserRepository {
 
     try {
       const resultado = await executarComandoSQL(query, []);
-      console.log("Query  executada com sucesso: ", resultado);
+      console.log("Query executada com sucesso: ", resultado);
     } catch (err) {
       console.error("Error");
     }
