@@ -52,3 +52,30 @@ O projeto estará disponível em:
 - Backend: http://localhost:5000
 
 
+### Comandos do Docker
+
+1. Iniciar containers
+```bash
+docker compose up -d
+```
+
+2. Iniciar containers com build -> usado para baixar novas dependencias (recriar)
+```bash
+docker compose up -d --build
+```
+
+3. Parar containers
+```bash
+docker compose down
+```
+
+4. Reiniciar containers -> atualizar código mais simples, como css ou lógicas
+```bash
+docker compose restart
+```
+
+5. Ver estado dos containers
+```bash
+docker ps
+```
+
