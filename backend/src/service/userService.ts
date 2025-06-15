@@ -1,21 +1,25 @@
-import { User } from "../model/classes/user";
+import { CoordenadorFactory } from "../model/abstractFactory/coordenadorFactory";
+import { ProfessorFactory } from "../model/abstractFactory/professorFactory";
+import { Coordenador } from "../model/classes/coordenador";
+import { Professor } from "../model/classes/professor";
+import { User } from "../model/interfaces/user";
 import { UserRepository } from "../repository/userRepository";
 
 export class UserService {
-    private UsuarioRepository = UserRepository.getInstance();
+  private UsuarioRepository = UserRepository.getInstance();
+  coordenadorFabrica = new CoordenadorFactory();
+  professorFabrica = new ProfessorFactory();
 
-    async cadastrarUsuario(userData:any):Promise<User>{
-        const {nome, email, curso, senha, tipo} = userData;
+  async cadastrarUsuario(userData: any): Promise<User> {
+    const { nome, email, curso, senha, tipo } = userData;
 
-        const usuario = new User(undefined, nome, email, curso, senha);
-
-        // Alguma regra de negocio
-
-        const novoUser = await this.UsuarioRepository.inserirUsuario(usuario);
-        console.log("Cadastrado: ", novoUser)
-        return new Promise<User>((resolve) => {
-            resolve(novoUser);
-        })
-
-    }
+    // Aplicando abstract factory
+    const usuario = tipo == "Coordenador" ? this.coordenadorFabrica.criarUsuario(nome, email, curso, senha) : this.professorFabrica.criarUsuario(nome, email, curso, senha)
+    
+    const novoUser = await this.UsuarioRepository.inserirUsuario(usuario);
+    console.log("Cadastrado: ", novoUser);
+    return new Promise<User>((resolve) => {
+      resolve(novoUser);
+    });
+  }
 }
