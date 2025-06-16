@@ -9,12 +9,23 @@ type Sala = {
   tipo: "Auditorio" | "Laboratorio" | "Sala de Aula";
 };
 
+type User = {
+  id: number;
+  nome: string;
+  email: string;
+  curso: string;
+  senha: string;
+  tipo: string;
+}
+
 // INTERFACE RESERVA - OBJETO TRANSACIONAL QUE ENVIA OS DADOS PARA O BACKEND
 type Reserva = {
+  userId: number;
   salaId: number;
-  horario: string;
-  usuario: string;
-  email: string;
+  dataDaSolicitacao: string;
+  dataDaReserva: string;
+  horarioInicio: string;
+  horarioFim: string;
 };
 
 // RESPOSTA DO BACKEND - RECEBE O STATUS E O XML QUE FOI ENVIADO
@@ -32,19 +43,29 @@ const Reservas: React.FC = () => {
     { id: 4, numero: 404, capacidadeMaxima: 20, tipo: "Laboratorio" },
   ];
 
+  // LISTA DE USUARIOS (EXEMPLO FICTICIO) - ESTAO PREDEFINIDAS NO FRONTEND
+  const users: User[] = [
+    {id: 1, nome: 'Golden', email: 'golden@gmail.com', curso: "ADS", senha: "1234@sdf", tipo: "Professor"},
+    {id: 2, nome: 'Anisio', email: 'anisio@gmail.com', curso: "ADS", senha: "1234@sdf2", tipo: "Professor"},
+    {id: 3, nome: 'Marcelo Polido', email: 'marcelo@gmail.com', curso: "ADS", senha: "1234@sdf22", tipo: "Coordenador"}
+  ];
+
   const [reservas, setReservas] = useState<Reserva[]>([]);
   const [respostas, setRespostas] = useState<Resposta[]>([]);
 
+  const [usuarioSelecionado, setUsuarioSelecionado] = useState<number | null>(null);
   const [salaSelecionada, setSalaSelecionada] = useState<number | null>(null);
-  const [novoHorario, setNovoHorario] = useState("");
-  const [novoUsuario, setNovoUsuario] = useState("");
-  const [novoEmail, setNovoEmail] = useState("");
+  const [dataDaSolicitacao, setDataSolicitada] = useState("");
+  const [dataDaReserva, setDataReserva] = useState("");
+  const [horarioInicio, setHorarioInicio] = useState("");
+  const [horarioFim, setHorarioFim] = useState("");
+  
 
   const [loading, setLoading] = useState(false);
 
   
   function adicionarReserva() {
-    if (!salaSelecionada || !novoHorario || !novoUsuario || !novoEmail) {
+    if (!salaSelecionada || !horarioInicio || !usuarioSelecionado || !horarioFim) {
       alert("PREENCHA TODOS OS CAMPOS");
       return;
     }
@@ -52,17 +73,21 @@ const Reservas: React.FC = () => {
     setReservas([
       ...reservas,
       {
+        userId: usuarioSelecionado,
         salaId: salaSelecionada,
-        horario: novoHorario,
-        usuario: novoUsuario,
-        email: novoEmail,
+        dataDaSolicitacao: dataDaSolicitacao,
+        dataDaReserva: dataDaReserva,
+        horarioInicio: horarioInicio,
+        horarioFim: horarioFim  
       },
     ]);
 
     setSalaSelecionada(null);
-    setNovoHorario("");
-    setNovoUsuario("");
-    setNovoEmail("");
+    setUsuarioSelecionado(null);
+    setDataSolicitada("");
+    setDataReserva("");
+    setHorarioInicio("");
+    setHorarioFim("");
   }
 
   function alterarHorario(index: number, novoHorario: string) {
@@ -101,6 +126,10 @@ const Reservas: React.FC = () => {
     return salas.find((s) => s.id === id);
   }
 
+  function buscarUser(id: number) {
+    return users.find((u) => u.id === id);
+  }
+
   return (
     <div
       style={{
@@ -136,11 +165,31 @@ const Reservas: React.FC = () => {
           ))}
         </select>
 
+        <select
+          value={usuarioSelecionado ?? ""}
+          onChange={(e) => setUsuarioSelecionado(Number(e.target.value))}
+          style={{
+            flex: 1,
+            padding: "8px",
+            borderRadius: 4,
+            border: "none",
+            backgroundColor: "#44475a",
+            color: "#e0e0e0",
+          }}
+        >
+          <option value="">SELECIONE O USUARIO</option>
+          {users.map((user) => (
+            <option key={user.id} value={user.id}>
+              {user.nome} (Tipo: {user.tipo})
+            </option>
+          ))}
+        </select>
+
         <input
-          type="text"
-          placeholder="HORARIO"
-          value={novoHorario}
-          onChange={(e) => setNovoHorario(e.target.value)}
+          type="date"
+          placeholder="DATA"
+          value={dataDaReserva}
+          onChange={(e) => setDataReserva(e.target.value)}
           style={{
             flex: 1,
             padding: "8px",
@@ -153,9 +202,9 @@ const Reservas: React.FC = () => {
 
         <input
           type="text"
-          placeholder="USUARIO"
-          value={novoUsuario}
-          onChange={(e) => setNovoUsuario(e.target.value)}
+          placeholder="HORARIO INICIO"
+          value={horarioInicio}
+          onChange={(e) => setHorarioInicio(e.target.value)}
           style={{
             flex: 1,
             padding: "8px",
@@ -167,10 +216,10 @@ const Reservas: React.FC = () => {
         />
 
         <input
-          type="email"
-          placeholder="EMAIL"
-          value={novoEmail}
-          onChange={(e) => setNovoEmail(e.target.value)}
+          type="text"
+          placeholder="HORARIO FIM"
+          value={horarioFim}
+          onChange={(e) => setHorarioFim(e.target.value)}
           style={{
             flex: 1,
             padding: "8px",
@@ -212,16 +261,18 @@ const Reservas: React.FC = () => {
         >
           <thead>
             <tr style={{ borderBottom: "2px solid #80cbc4" }}>
-              <th style={{ padding: "8px 12px" }}>TIPO</th>
+              <th style={{ padding: "8px 12px" }}>RESERVADO PARA:</th>
+              <th style={{ padding: "8px 12px" }}>SALA</th>
               <th style={{ padding: "8px 12px" }}>NUMERO</th>
-              <th style={{ padding: "8px 12px" }}>HORARIO</th>
-              <th style={{ padding: "8px 12px" }}>USUARIO</th>
-              <th style={{ padding: "8px 12px" }}>EMAIL</th>
+              <th style={{ padding: "8px 12px" }}>DATA</th>
+              <th style={{ padding: "8px 12px" }}>HORARIO INICIO</th>
+              <th style={{ padding: "8px 12px" }}>HORARIO FINAL</th>
             </tr>
           </thead>
           <tbody>
-            {reservas.map(({ salaId, horario, usuario, email }, i) => {
+            {reservas.map(({ userId, salaId, dataDaReserva, horarioInicio, horarioFim }, i) => {
               const sala = buscarSala(salaId);
+              const user = buscarUser(userId)
               return (
                 <tr
                   key={i}
@@ -230,16 +281,20 @@ const Reservas: React.FC = () => {
                     backgroundColor: i % 2 === 0 ? "#2a2a40" : "#232337",
                   }}
                 >
+                  <td style={{ padding: "8px 12px"}}>
+                    {user ? user.nome : "Desconhecido"}
+                  </td>
                   <td style={{ padding: "8px 12px" }}>
                     {sala ? sala.tipo : "Desconhecida"}
                   </td>
                   <td style={{ padding: "8px 12px" }}>
                     {sala ? sala.numero : "?"}
                   </td>
+                  <td style={{ padding: "8px 12px" }}>{dataDaReserva}</td>
                   <td style={{ padding: "8px 12px" }}>
                     <input
                       type="text"
-                      value={horario}
+                      value={horarioInicio}
                       onChange={(e) => alterarHorario(i, e.target.value)}
                       style={{
                         width: "100%",
@@ -252,8 +307,22 @@ const Reservas: React.FC = () => {
                       }}
                     />
                   </td>
-                  <td style={{ padding: "8px 12px" }}>{usuario}</td>
-                  <td style={{ padding: "8px 12px" }}>{email}</td>
+                  <td style={{ padding: "8px 12px" }}>
+                    <input
+                      type="text"
+                      value={horarioFim}
+                      onChange={(e) => alterarHorario(i, e.target.value)}
+                      style={{
+                        width: "100%",
+                        backgroundColor: "#44475a",
+                        border: "none",
+                        color: "#e0e0e0",
+                        padding: "6px",
+                        borderRadius: 4,
+                        fontSize: "1rem",
+                      }}
+                    />
+                  </td>
                 </tr>
               );
             })}
