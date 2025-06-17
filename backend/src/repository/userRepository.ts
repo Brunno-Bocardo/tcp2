@@ -4,7 +4,7 @@ import { User } from "../model/interfaces/IUser";
 export class UserRepository {
   private static instance: UserRepository;
 
-  private constructor() {
+  constructor() {
     this.createTable();
   }
 
@@ -29,7 +29,7 @@ export class UserRepository {
 
     try {
       const resultado = await executarComandoSQL(query, []);
-      console.log("Query  executada com sucesso: ", resultado);
+      console.log("Query executada com sucesso: ", resultado);
     } catch (err) {
       console.error("Error");
     }
@@ -87,11 +87,20 @@ export class UserRepository {
       throw err;
     }
   }
+  
 
-  async buscarUsuarioPorEmailESenha(usuario: string, senha: string): Promise<boolean> {
-        const query = "SELECT * FROM Users WHERE username = ? AND password = ?";
-        const result = await executarComandoSQL(query, [usuario, senha]);
-        console.log("Busca efetuada com sucesso: ", result);
-        return result.length > 0;
+  async filtraUsuarioByEmail(email?: string): Promise<User> {
+    let query = "SELECT * FROM room_reservation.Users where email = ?";
+
+    try {
+      const resultado = await executarComandoSQL(query, [email]);
+      console.log("Busca efetuada com sucesso: ", resultado);
+      return new Promise<User>((resolve) => {
+        resolve(resultado);
+      });
+    } catch (err: any) {
+      console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
+      throw err;
     }
+  }
 }
