@@ -4,7 +4,7 @@ import { User } from "../model/interfaces/IUser";
 export class UserRepository {
   private static instance: UserRepository;
 
-  private constructor() {
+  constructor() {
     this.createTable();
   }
 
@@ -78,6 +78,22 @@ export class UserRepository {
 
     try {
       const resultado = await executarComandoSQL(query, [name]);
+      console.log("Busca efetuada com sucesso: ", resultado);
+      return new Promise<User>((resolve) => {
+        resolve(resultado);
+      });
+    } catch (err: any) {
+      console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
+      throw err;
+    }
+  }
+  
+
+  async filtraUsuarioByEmail(email?: string): Promise<User> {
+    let query = "SELECT * FROM room_reservation.Users where email = ?";
+
+    try {
+      const resultado = await executarComandoSQL(query, [email]);
       console.log("Busca efetuada com sucesso: ", resultado);
       return new Promise<User>((resolve) => {
         resolve(resultado);

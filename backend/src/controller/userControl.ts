@@ -17,6 +17,23 @@ export function cadastrarUsuario(req: Request, res: Response){
     }
 };
 
+
+export function userLogin(req: Request, res: Response){
+    try{
+        const usuario = UsuarioService.userLogin(req.body);
+        res.status(200).json(
+            {
+                mensagem: "Usuario logado com sucesso!",
+                user: usuario
+            }
+        );
+    } catch (error: any){
+        res.status(400).json({message:error.message})
+    }
+};
+
+
+
 // export function verificarUsuario(req:Request, res:Response){
 //     try{
 //         const userData = UsuarioService.verificarUsuario(req.body)
