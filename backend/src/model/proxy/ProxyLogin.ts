@@ -1,12 +1,8 @@
 import { ILogin } from "../interfaces/ILogin";
-import { Login } from "../classes/Login";
+import { UserService } from "../../service/userService";
 
 export class ProxyLogin implements ILogin {
-    private loginClass: Login;
-
-    constructor() {
-        this.loginClass = new Login();
-    }
+    private userService = new UserService(); // Instancia o serviço diretamente
 
     public async login(usuario: string, senha: string): Promise<boolean> {
         console.log(`Tentativa de login para o usuário: ${usuario}`);
@@ -17,6 +13,14 @@ export class ProxyLogin implements ILogin {
             return false;
         }
 
-        return await this.loginClass.login(usuario, senha);
+        try {
+            // Delegando ao serviço diretamente
+            const usuarioLogado = await this.userService.userLogin({ usuario, senha });
+            console.log("Login realizado com sucesso:", usuarioLogado);
+            return true;
+        } catch (error: any) {
+            console.error("Erro ao realizar login:", error.message);
+            return false;
+        }
     }
 }

@@ -1,4 +1,4 @@
-import { CoordenadorFactory } from "../model/abstractFactory/CoordenadorFactory";
+import { CoordenadorFactory } from "../model/abstractFactory/coordenadorFactory";
 import { ProfessorFactory } from "../model/abstractFactory/ProfessorFactory";
 import { Coordenador } from "../model/classes/Coordenador";
 import { Professor } from "../model/classes/Professor";
@@ -36,5 +36,22 @@ export class UserService {
   //   }
 
   // }
+
+
+  async userLogin(userData: any): Promise<User> {
+    const { email, senha } = userData;
+    const usuario = await this.UsuarioRepository.filtraUsuarioByEmail(email);
+
+    if (!usuario) {
+      throw new Error("Usuário não encontrado");
+    }
+    if (usuario.senha !== senha) {
+      throw new Error("Senha incorreta");
+    }
+
+    return new Promise<User>((resolve) => {
+      resolve(usuario);
+    });
+  }
 
 }
