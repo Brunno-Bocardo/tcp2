@@ -87,4 +87,11 @@ export class UserRepository {
       throw err;
     }
   }
+
+  async buscarUsuarioPorEmailESenha(usuario: string, senha: string): Promise<boolean> {
+        const query = "SELECT * FROM Users WHERE username = ? AND password = ?";
+        const result = await executarComandoSQL(query, [usuario, senha]);
+        console.log("Busca efetuada com sucesso: ", result);
+        return result.length > 0;
+    }
 }

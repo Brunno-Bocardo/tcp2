@@ -4,8 +4,8 @@ const dbConfig = {
     host: 'localhost',
     port: 3306,
     user: 'root',
-    password: 'root',
-    database: 'room_reservation'
+    password: 'admin',
+    database: 'tcp2_db'
 };
 
 const mysqlConnection: Connection = mysql.createConnection(dbConfig)
