@@ -1,5 +1,5 @@
 import { executarComandoSQL } from "../database/mysql";
-import { Reserva} from "../model/classes/Reserva";
+import { Reserva} from "../model/classes/reserva";
 
 export class ReservaRepository {
     private static instance: ReservaRepository;

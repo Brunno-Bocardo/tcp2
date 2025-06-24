@@ -1,4 +1,4 @@
-import { Professor } from "../classes/Professor";
+import { Professor } from "../classes/professor";
 import { User } from "../interfaces/IUser";
 import { UserFactory } from "./IUserFactory";
 

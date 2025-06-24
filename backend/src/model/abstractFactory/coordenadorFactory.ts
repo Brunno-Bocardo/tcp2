@@ -1,6 +1,6 @@
 import { User } from "../interfaces/IUser";
 import { UserFactory } from "./IUserFactory";
-import { Coordenador } from "../classes/Coordenador";
+import { Coordenador } from "../classes/coordenador";
 
 export class CoordenadorFactory implements UserFactory {
   criarUsuario(

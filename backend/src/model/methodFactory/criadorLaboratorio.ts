@@ -1,6 +1,6 @@
-import { Laboratorio } from "../classes/Laboratorio";
+import { Laboratorio } from "../classes/laboratorio";
 import { Sala } from "../interfaces/ISala";
-import { CriadorSala } from "./CriadorSala";
+import { CriadorSala } from "./criadorSala";
 
 export class CriadorLaboratorio extends CriadorSala {
   criarSala(numeroSala: number, capacidadeMaxima: number): Sala {

@@ -1,5 +1,5 @@
 import { EventEmitterAsyncResource } from "node:stream";
-import { Reserva } from "../model/classes/Reserva";
+import { Reserva } from "../model/classes/reserva";
 import { ReservaRepository } from "../repository/reservaRepository";
 
 export class ReservaService {

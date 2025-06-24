@@ -1,7 +1,7 @@
 import { Sala } from "../model/interfaces/ISala";
-import { CriadorAuditorio } from "../model/methodFactory/CriadorAuditorio";
-import { CriadorLaboratorio } from "../model/methodFactory/CriadorLaboratorio";
-import { CriadorSalaDeAula } from "../model/methodFactory/CriadorSalaDeAula";
+import { CriadorAuditorio } from "../model/methodFactory/criadorAuditorio";
+import { CriadorLaboratorio } from "../model/methodFactory/criadorLaboratorio";
+import { CriadorSalaDeAula } from "../model/methodFactory/criadorSalaDeAula";
 import { SalaRepository } from "../repository/salaRepository";
 
 export class SalaService {
