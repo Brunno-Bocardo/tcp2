@@ -1,5 +1,5 @@
 import { CoordenadorFactory } from "../model/abstractFactory/coordenadorFactory";
-import { ProfessorFactory } from "../model/abstractFactory/ProfessorFactory";
+import { ProfessorFactory } from "../model/abstractFactory/professorFactory";
 import { Coordenador } from "../model/classes/coordenador";
 import { Professor } from "../model/classes/professor";
 import { User } from "../model/interfaces/IUser";
