@@ -17,7 +17,7 @@ export class UserRepository {
 
   private async createTable() {
     const query = `
-        CREATE TABLE IF NOT EXISTS room_reservation.Users
+        CREATE TABLE IF NOT EXISTS tcp2_db.Users
         (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nome VARCHAR(255) NOT NULL,
@@ -37,7 +37,7 @@ export class UserRepository {
 
   async inserirUsuario(user: User): Promise<User> {
     const query =
-      "INSERT INTO room_reservation.Users(nome, email, curso, senha, tipo) VALUES (?,?,?,?,?)";
+      "INSERT INTO tcp2_db.Users(nome, email, curso, senha, tipo) VALUES (?,?,?,?,?)";
 
     try {
       const resultado = await executarComandoSQL(query, [
@@ -59,7 +59,7 @@ export class UserRepository {
   }
 
   async filtraUsuarioById(id?: number): Promise<User[]> {
-    let query = "SELECT * FROM room_reservation.Users where id = ?";
+    let query = "SELECT * FROM tcp2_db.Users where id = ?";
 
     try {
       const resultado = await executarComandoSQL(query, [id]);
@@ -74,7 +74,7 @@ export class UserRepository {
   }
 
   async filtraUsuarioByName(name?: number): Promise<User> {
-    let query = "SELECT * FROM room_reservation.Users where nome = ?";
+    let query = "SELECT * FROM tcp2_db.Users where nome = ?";
 
     try {
       const resultado = await executarComandoSQL(query, [name]);
@@ -90,7 +90,7 @@ export class UserRepository {
   
 
   async filtraUsuarioByEmail(email?: string): Promise<User> {
-    let query = "SELECT * FROM room_reservation.Users where email = ?";
+    let query = "SELECT * FROM tcp2_db.Users where email = ?";
 
     try {
       const resultado = await executarComandoSQL(query, [email]);

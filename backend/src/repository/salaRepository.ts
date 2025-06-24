@@ -17,7 +17,7 @@ export class SalaRepository {
     
         private async createTable() {
             const query = `
-                CREATE TABLE IF NOT EXISTS room_reservation.Rooms
+                CREATE TABLE IF NOT EXISTS tcp2_db.Rooms
                 (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     numero INT NOT NULL,

@@ -17,7 +17,7 @@ export class ReservaRepository {
 
     private async createTable() {
         const query = `
-            CREATE TABLE IF NOT EXISTS room_reservation.Reservations
+            CREATE TABLE IF NOT EXISTS tcp2_db.Reservations
             (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
