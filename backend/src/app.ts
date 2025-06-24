@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { jsonParaXmlAdapter } from "./service/adapter";
-import { IReserva } from "./model/interfaces/IReserva";
+import { IReserva } from "./model/interfaces/ireserva";
 import { ProxyLogin } from "./model/proxy/ProxyLogin";
 import { cadastrarUsuario } from "./controller/userControl";
 
