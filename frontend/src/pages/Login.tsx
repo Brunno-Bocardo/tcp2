@@ -22,7 +22,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
             const response = await fetch("http://localhost:5000/api/login", {
                 method: "POST", // METODO POST PRA MANDAR OS DADOS
                 headers: { "Content-Type": "application/json" }, // DIZENDO QUE VAMOS ENVIAR JSON
-                body: JSON.stringify({ usuario: nome, senha }), // TRANSFORMANDO OBJETO EM JSON PARA ENVIAR
+                body: JSON.stringify({ email: nome, senha }), // TRANSFORMANDO OBJETO EM JSON PARA ENVIAR
             });
 
             // PEGANDO A RESPOSTA E CONVERTENDO PARA OBJETO JS

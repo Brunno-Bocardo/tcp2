@@ -38,8 +38,8 @@ export class UserService {
   // }
 
 
-  async userLogin(userData: any): Promise<User> {
-    const { email, senha } = userData;
+  async userLogin(email: string, senha: string): Promise<User> {
+    console.log(email);
     const usuario = await this.UsuarioRepository.filtraUsuarioByEmail(email);
 
     if (!usuario) {

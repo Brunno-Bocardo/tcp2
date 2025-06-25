@@ -58,13 +58,13 @@ export class UserRepository {
     }
   }
 
-  async filtraUsuarioById(id?: number): Promise<User[]> {
+  async filtraUsuarioById(id?: number): Promise<User> {
     let query = "SELECT * FROM tcp2_db.Users where id = ?";
 
     try {
       const resultado = await executarComandoSQL(query, [id]);
       console.log("Busca efetuada com sucesso: ", resultado);
-      return new Promise<User[]>((resolve) => {
+      return new Promise<User>((resolve) => {
         resolve(resultado);
       });
     } catch (err: any) {
@@ -89,15 +89,19 @@ export class UserRepository {
   }
   
 
-  async filtraUsuarioByEmail(email?: string): Promise<User> {
-    let query = "SELECT * FROM tcp2_db.Users where email = ?";
+  async filtraUsuarioByEmail(email?: string): Promise<User | undefined> {
+    let query = "SELECT * FROM tcp2_db.users where email = ?";
+    
+    console.log("Email, ", email);
 
     try {
       const resultado = await executarComandoSQL(query, [email]);
       console.log("Busca efetuada com sucesso: ", resultado);
-      return new Promise<User>((resolve) => {
-        resolve(resultado);
-      });
+      
+      // Verifica se há resultados e retorna o primeiro
+      if (resultado) {
+        return resultado[0];
+      }
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
       throw err;

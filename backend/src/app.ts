@@ -5,8 +5,24 @@ import { IReserva } from "./model/interfaces/ireserva";
 import { ProxyLogin } from "./model/proxy/ProxyLogin";
 import { cadastrarUsuario } from "./controller/userControl";
 
+import { ReservaRepository } from "./repository/reservaRepository";
+import { SalaRepository } from "./repository/salaRepository";
+import { UserRepository } from "./repository/userRepository";
+
 const app = express();
 const PORT = process.env.PORT ?? 5000;
+
+inicializarTabelas();
+async function inicializarTabelas() {
+  try {
+    await UserRepository.getInstance();
+    await SalaRepository.getInstance();
+    await ReservaRepository.getInstance();
+    console.log("Tabelas inicializadas com sucesso!");
+  } catch (error) {
+    console.error("Erro ao inicializar tabelas:", error);
+  }
+}
 
 // CONFIGURA CORS PRA PERMITIR O FRONT
 app.use(cors({
@@ -42,10 +58,11 @@ app.post("/api/reserva", (req: Request, res: Response) => {
 // ENDPOINT DE LOGIN
 app.post("/api/login", async (req: Request, res: Response) => {
   console.log("[LOGIN RECEBIDO]:", req.body);
-  const { usuario, senha } = req.body;
+  const { email, senha } = req.body;
 
   const proxyLogin = new ProxyLogin();
-  const success = await proxyLogin.login(usuario, senha);
+  
+  const success = await proxyLogin.login(email, senha);
 
   console.log("[LOGIN RESULTADO]:", success);
 
@@ -60,3 +77,4 @@ app.post("/api/login", async (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`API EXECUTANDO NA URL: http://localhost:${PORT}`);
 });
+
