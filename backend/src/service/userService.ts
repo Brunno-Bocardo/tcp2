@@ -1,7 +1,7 @@
 import { CoordenadorFactory } from "../patterns/abstractFactory/coordenadorFactory";
 import { ProfessorFactory } from "../patterns/abstractFactory/professorFactory";
-import { Coordenador } from "../model/classes/Coordenador";
-import { Professor } from "../model/classes/Professor";
+import { Coordenador } from "../model/classes/coordenador";
+import { Professor } from "../model/classes/professor";
 import { User } from "../model/interfaces/IUser";
 import { UserRepository } from "../repository/userRepository";
 

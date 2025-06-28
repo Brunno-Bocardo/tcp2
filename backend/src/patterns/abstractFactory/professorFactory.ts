@@ -1,4 +1,4 @@
-import { Professor } from "../../model/classes/Professor";
+import { Professor } from "../../model/classes/professor";
 import { User } from "../../model/interfaces/IUser";
 import { UserFactory } from "./IUserFactory";
 
