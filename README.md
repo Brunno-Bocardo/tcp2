@@ -2,7 +2,7 @@
 
 Projeto desenvolvido para a disciplina de Técnicas de Programação 2, implementando um sistema de reserva de salas com padrões de projeto e práticas modernas de desenvolvimento.
 
-## 💡 Sobre o Projeto
+## Sobre o Projeto
 
 Este sistema permite o gerenciamento de reservas de diferentes tipos de salas (Auditórios, Laboratórios e Salas de Aula), implementando:
 
@@ -18,16 +18,11 @@ Este sistema permite o gerenciamento de reservas de diferentes tipos de salas (A
 - **Factory Method**: Criação de diferentes tipos de salas
 - **Abstract Factory**: Fabrica diferentes tipos de usuário
 - **Singleton**: Gerenciamento de conexão com banco de dados
+- **Proxy**: Cria uma camada de segurança ao realizar o login
 -
--
 
-## 🚀 Como Executar
+## Como Executar
 
-### Pré-requisitos
-
-- Docker Desktop instalado
-
-### Executando
 
 1. Clone o repositório:
 ```bash
@@ -41,41 +36,28 @@ code .
 cp .env.example .env
 ```
 
-3. Inicie os containers:
+3. Baixe as dependências no diretório raiz:
 ```bash
-docker compose up -d
-```
-**OBS:** O Docker Desktop deve estar aberto
-
-O projeto estará disponível em:
-- Frontend: http://localhost:3000
-- Backend: http://localhost:5000
-
-
-### Comandos do Docker
-
-1. Iniciar containers
-```bash
-docker compose up -d
+npm i
 ```
 
-2. Iniciar containers com build -> usado para baixar novas dependencias (recriar)
+4. Entre no diretório do frontend, baixe as dependências, e o inicie:
 ```bash
-docker compose up -d --build
+cd frontend
+npm i
+npm run start
 ```
 
-3. Parar containers
+5. Abra o MySQL Workbench, e garanta que ele está funcionando. Em seguida, configure o arquivo `.env` de acordo com o seu usuário e senha.
+
+
+6. Em outro terminal, entre no diretório do backend, baixe as dependências, dê build no projeto e o inicie:
 ```bash
-docker compose down
+cd backend
+npm i
+npm run build
 ```
 
-4. Reiniciar containers -> atualizar código mais simples, como css ou lógicas
-```bash
-docker compose restart
-```
 
-5. Ver estado dos containers
-```bash
-docker ps
-```
+
 

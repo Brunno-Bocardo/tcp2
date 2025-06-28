@@ -1,4 +1,4 @@
-import { ILogin } from "../interfaces/ILogin";
+import { ILogin } from "../../model/interfaces/ILogin";
 import { UserService } from "../../service/userService";
 
 export class ProxyLogin implements ILogin {
