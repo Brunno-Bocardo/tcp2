@@ -17,17 +17,17 @@ export class ReservaRepository {
 
     private async createTable() {
         const query = `
-            CREATE TABLE IF NOT EXISTS tcp2_db.Reservations (
+            CREATE TABLE IF NOT EXISTS tcp2_db.Reservations
+            (
                 id INT AUTO_INCREMENT PRIMARY KEY,
                 user_id INT NOT NULL,
                 sala_id INT NOT NULL,
-                dia DATE NOT NULL,
-                horario_inicio TIME NOT NULL,
-                horario_fim TIME NOT NULL,
-                data_da_solicitacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                status ENUM('Pendente', 'Aprovada', 'Cancelada') DEFAULT 'Pendente',
-                FOREIGN KEY (user_id) REFERENCES users(id),
-                FOREIGN KEY (sala_id) REFERENCES salas(id),
+                data_da_solicitacao DATE NOT NULL,
+                data_da_reserva DATE NOT NULL,
+                horario_de_inicio TIME NOT NULL,
+                horario_de_fim TIME NOT NULL,
+                FOREIGN KEY (user_id) REFERENCES Users(id),
+                FOREIGN KEY (sala_id) REFERENCES Rooms(id),
                 created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
             )`;

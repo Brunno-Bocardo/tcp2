@@ -31,27 +31,22 @@ cd tcp2
 code .
 ```
 
-2. Crie o arquivo `.env` a partir do `.env.example`:
-```bash
-cp .env.example .env
-```
-
-3. Baixe as dependências no diretório raiz:
+2. Baixe as dependências no diretório raiz:
 ```bash
 npm i
 ```
 
-4. Entre no diretório do frontend, baixe as dependências, e o inicie:
+3. Entre no diretório do frontend, baixe as dependências, e o inicie:
 ```bash
 cd frontend
 npm i
 npm run start
 ```
 
-5. Abra o MySQL Workbench, e garanta que ele está funcionando. Em seguida, configure o arquivo `.env` de acordo com o seu usuário e senha.
+4. Abra o MySQL Workbench, e garanta que ele está funcionando. Em seguida, configure no arquivo `mysql.ts`, as configurações de conexão (user e senha).
 
 
-6. Em outro terminal, entre no diretório do backend, baixe as dependências, dê build no projeto e o inicie:
+5. Em outro terminal, entre no diretório do backend, baixe as dependências, dê build no projeto e o inicie:
 ```bash
 cd backend
 npm i

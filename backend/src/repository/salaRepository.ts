@@ -17,11 +17,12 @@ export class SalaRepository {
     
         private async createTable() {
             const query = `
-                CREATE TABLE IF NOT EXISTS tcp2_db.Rooms (
+                CREATE TABLE IF NOT EXISTS tcp2_db.Rooms
+                (
                     id INT AUTO_INCREMENT PRIMARY KEY,
                     numero INT NOT NULL,
                     capacidade_maxima INT NOT NULL,
-                    tipo ENUM('Auditorio', 'Laboratorio', 'Sala de Aula') NOT NULL,
+                    tipo VARCHAR(255) NOT NULL,
                     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 )`;

@@ -12,6 +12,7 @@ import { UserRepository } from "./repository/userRepository";
 const app = express();
 const PORT = process.env.PORT ?? 5000;
 
+
 inicializarTabelas();
 async function inicializarTabelas() {
   try {
@@ -23,6 +24,7 @@ async function inicializarTabelas() {
     console.error("Erro ao inicializar tabelas:", error);
   }
 }
+
 
 // CONFIGURA CORS PRA PERMITIR O FRONT
 app.use(cors({
@@ -77,4 +79,5 @@ app.post("/api/login", async (req: Request, res: Response) => {
 app.listen(PORT, () => {
   console.log(`API EXECUTANDO NA URL: http://localhost:${PORT}`);
 });
+
 

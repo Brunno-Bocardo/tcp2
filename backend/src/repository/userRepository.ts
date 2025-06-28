@@ -17,13 +17,14 @@ export class UserRepository {
 
   private async createTable() {
     const query = `
-        CREATE TABLE IF NOT EXISTS tcp2_db.Users (
+        CREATE TABLE IF NOT EXISTS tcp2_db.Users
+        (
             id INT AUTO_INCREMENT PRIMARY KEY,
             nome VARCHAR(255) NOT NULL,
-            email VARCHAR(255) NOT NULL UNIQUE,
-            curso VARCHAR(255),
+            email VARCHAR(255) NOT NULL,
+            curso VARCHAR(255) NOT NULL,
             senha VARCHAR(255) NOT NULL,
-            tipo ENUM('Professor', 'Coordenador') NOT NULL,
+            tipo VARCHAR(255) NOT NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
         )`;
