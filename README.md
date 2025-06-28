@@ -51,6 +51,7 @@ npm run start
 cd backend
 npm i
 npm run build
+npm run dev
 ```
 
 
