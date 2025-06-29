@@ -9,7 +9,7 @@ export class Reserva {
     horarioInicio: string;
     horarioFim: string;
 
-  constructor(dataSolicitacao: string, dia: string, inicio: string, fim: string, id?: number, userId?: number, salaId?: number) {
+  constructor(userId: number, salaId: number, dataSolicitacao: string, dia: string, inicio: string, fim: string, id?: number) {
     this.id = id || 0;
     this.userId = userId || 0;
     this.salaId = salaId || 0;
@@ -18,6 +18,7 @@ export class Reserva {
     this.horarioInicio = this.formatadorDeTempo(inicio);
     this.horarioFim = this.formatadorDeTempo(fim);
   }
+  
 
   formatadorDeData(data:string): Date {
     const dataConvertida = parse(data, 'dd/MM/yyyy', new Date());
