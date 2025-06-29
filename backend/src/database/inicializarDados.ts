@@ -1,12 +1,35 @@
-import { UserRepository } from "../repository/userRepository";
-import { SalaRepository } from "../repository/salaRepository";
 import { ProfessorFactory } from "../patterns/abstractFactory/professorFactory";
 import { CoordenadorFactory } from "../patterns/abstractFactory/coordenadorFactory";
 import { CriadorAuditorio } from "../patterns/methodFactory/criadorAuditorio";
 import { CriadorLaboratorio } from "../patterns/methodFactory/criadorLaboratorio";
 import { CriadorSalaDeAula } from "../patterns/methodFactory/criadorSalaDeAula";
 import { ReservaRepository } from "../repository/reservaRepository";
+import { SalaRepository } from "../repository/salaRepository";
+import { UserRepository } from "../repository/userRepository";
 import { LogRepository } from "../repository/logRepository";
+import { criarBancoDeDados, inicializarPool } from "./mysql";
+
+
+export async function inicializarSistema() {
+  try {
+    console.log("Iniciando configuração do sistema...");
+
+    // 1. Criar banco de dados se não existir
+    await criarBancoDeDados();
+
+    // 2. Inicializar pool de conexões
+    await inicializarPool();
+
+    // 3. Inicializar tabelas e dados
+    await inicializarTabelasEDados();
+
+    // 4. Iniciar servidor após configuração
+    
+  } catch (error) {
+    console.error("Erro fatal durante a inicialização do sistema:", error);
+    process.exit(1);
+  }
+}
 
 
 export async function inicializarDados() {

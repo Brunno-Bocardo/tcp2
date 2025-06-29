@@ -3,15 +3,11 @@ import cors from "cors";
 import { jsonParaXmlAdapter } from "./patterns/adapter/adapter";
 import { IReserva } from "./model/interfaces/ireserva";
 import { ProxyLogin } from "./patterns/proxy/ProxyLogin";
-import { cadastrarUsuario } from "./controller/userControl";
 import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
-import { reservarSala } from "./controller/reservaControl";
-import { atualizarSala, cadastrarSala, excluirSala, filtrarSala, filtrarSalas } from "./controller/salaControl";
 import { LogRepository } from "./repository/logRepository";
-import { inicializarTabelasEDados } from "./database/inicializarDados";
-import { criarBancoDeDados, inicializarPool } from "./database/mysql";
+import { inicializarSistema } from "./database/inicializarDados";
 
 
 inicializarTabelas();
@@ -44,31 +40,11 @@ app.use(cors({
 app.use(express.json());
 
 // Inicializa o sistema de forma sequencial
-async function inicializarSistema() {
-  try {
-    console.log("Iniciando configuração do sistema...");
-
-    // 1. Criar banco de dados se não existir
-    await criarBancoDeDados();
-
-    // 2. Inicializar pool de conexões
-    await inicializarPool();
-
-    // 3. Inicializar tabelas e dados
-    await inicializarTabelasEDados();
-
-    // 4. Iniciar servidor após configuração
-    app.listen(PORT, () => {
-      console.log(`API EXECUTANDO NA URL: http://localhost:${PORT}`);
-    });
-  } catch (error) {
-    console.error("Erro fatal durante a inicialização do sistema:", error);
-    process.exit(1);
-  }
-}
-
 inicializarSistema();
 
+app.listen(PORT, () => {
+  console.log(`API EXECUTANDO NA URL: http://localhost:${PORT}`);
+});
 
 // ========================= BACKEND LEGADO =========================
 
