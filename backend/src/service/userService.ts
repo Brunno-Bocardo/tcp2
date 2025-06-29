@@ -24,16 +24,6 @@ export class UserService {
     });
   }
 
-  // async verificarUsuario(userData:any): Promise<User> {
-  //   const {nome, senha} = userData;
-
-  //   const bancoUser = await this.UsuarioRepository.filtraUsuarioByName(nome);
-    
-  //   if(bancoUser.senha == senha){
-
-  //   }
-
-  // }
 
 
   async userLogin(email: string, senha: string): Promise<User> {

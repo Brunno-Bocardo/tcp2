@@ -1,25 +1,46 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Login from "./pages/Login";
 import Reservas from "./pages/Reservas";
 
 // COMPONENTE PRINCIPAL DO APP QUE ESCOLHE ENTRE LOGIN E RESERVAS
 export default function App() {
-  // ESTADO PRA GUARDAR O NOME DO USUARIO LOGADO OU NULL SE NAO TIVER NINGUEM
-  const [usuarioLogado, setUsuarioLogado] = useState<string | null>(null);
+  const [usuarioLogado, setUsuarioLogado] = useState<any>(null);
 
-  // FUNCAO QUE RECEBE O NOME DO USUARIO E SALVA NO ESTADO
-  function handleLogin(nome: string) {
-    setUsuarioLogado(nome);
+  // AO MONTAR O COMPONENTE, TENTA CARREGAR O EMAIL DO LOCALSTORAGE
+  useEffect(() => {
+    const usuarioSalvo = localStorage.getItem("usuarioLogado");
+    if (usuarioSalvo) {
+      setUsuarioLogado(JSON.parse(usuarioSalvo));
+    }
+  }, []);
+
+  // FUNCAO QUE RECEBE O EMAIL DO USUARIO E SALVA NO ESTADO E LOCALSTORAGE
+  function handleLogin(usuario: any) {
+    localStorage.setItem("usuarioLogado", JSON.stringify(usuario));
+    setUsuarioLogado(usuario);
+  }
+
+  // FUNCAO PARA DESLOGAR
+  function handleLogout() {
+    localStorage.removeItem("usuarioLogado");
+    setUsuarioLogado(null);
   }
 
   return (
-    // DIV CENTRALIZADA E COM FUNDO ESCURO
     <div className="flex items-center justify-center min-h-screen bg-[#1e1e2f]">
-      {/* SE TIVER USUARIO LOGADO MOSTRA AS RESERVAS, SE NAO MOSTRA O LOGIN */}
       {usuarioLogado ? (
-        <Reservas nomeUsuario={usuarioLogado} />  // PASSA O NOME DO USUARIO PARA O COMPONENTE RESERVAS
+        <>
+          <button
+            onClick={handleLogout}
+            className="absolute top-4 right-4 bg-red-500 text-white px-4 py-2 rounded"
+          >
+            Sair
+          </button>
+
+          <Reservas nomeUsuario={usuarioLogado.email} />
+        </>
       ) : (
-        <Login onLogin={handleLogin} />  // PASSA A FUNCAO PARA O LOGIN CHAMAR QUANDO LOGAR
+        <Login onLogin={handleLogin} />
       )}
     </div>
   );
