@@ -1,16 +1,30 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { jsonParaXmlAdapter } from "./patterns/adapter/adapter";
-import { IReserva } from "./model/interfaces/ireserva";
+import { IReserva } from "./model/interfaces/IReserva";
 import { ProxyLogin } from "./patterns/proxy/ProxyLogin";
 import { cadastrarUsuario } from "./controller/userControl";
 import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
+import { reservarSala } from "./controller/reservaControl";
+import { atualizarSala, cadastrarSala, excluirSala, filtrarSala, filtrarSalas } from "./controller/salaControl";
 import { LogRepository } from "./repository/logRepository";
 import { inicializarTabelasEDados } from "./database/inicializarDados";
 import { criarBancoDeDados, inicializarPool } from "./database/mysql";
 
+
+inicializarTabelas();
+async function inicializarTabelas() {
+  try {
+    await UserRepository.getInstance();
+    await SalaRepository.getInstance();
+    await ReservaRepository.getInstance();
+    console.log("Tabelas inicializadas com sucesso!");
+  } catch (error) {
+    console.error("Erro ao inicializar tabelas:", error);
+  }
+}
 
 // ========================== INICIALIZAÇÃO =========================
 
@@ -63,6 +77,27 @@ function backendLegado(xml: string) {
   console.log("[BACKEND LEGADO RECEBENDO XML]:\n", xml);
 }
 
+// ENDPOINTS RESERVA
+app.post("/api/reservaSala", reservarSala)
+
+// ENDPOINTS RESERVA
+app.post("/api/user", cadastrarUsuario)
+
+// ENDPOINTS SALA
+app.post("/api/sala", cadastrarSala)
+app.get("/api/sala", filtrarSala)
+app.put("/api/sala", atualizarSala)
+app.delete("/api/sala", excluirSala)
+app.get("/api/salas", filtrarSalas)
+
+// ENDPOINT DE RESERVA
+app.post("/api/reserva", (req: Request, res: Response) => {
+  const dados: IReserva = req.body; // <- OBJETO TRANSACIONAL EM JSON
+  console.log("[JSON RECEBIDO]:", dados);
+
+  const xml = jsonParaXmlAdapter(dados); // <- AQUI O ADAPTER AGE
+
+  backendLegado(xml);
 
 // ========================= ROTAS =========================
 

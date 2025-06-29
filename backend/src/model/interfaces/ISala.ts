@@ -3,5 +3,4 @@ export interface Sala {
     numero:number;
     capacidadeMaxima:number;
     tipo: String;
-    reservar():void;
 }

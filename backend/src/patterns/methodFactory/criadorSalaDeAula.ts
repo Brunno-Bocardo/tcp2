@@ -1,9 +1,9 @@
-import { SalaDeAula } from "../../model/classes/salaDeAula";
+import { SalaDeAula } from "../../model/classes/SalaDeAula";
 import { Sala } from "../../model/interfaces/ISala";
 import { CriadorSala } from "./CriadorSala";
 
 export class CriadorSalaDeAula extends CriadorSala {
-  public criarSala(numeroSala: number, capacidadeMaxima: number): Sala {
-    return new SalaDeAula(undefined, numeroSala, capacidadeMaxima);
+  public criarSala(salaId: number, numeroSala: number, capacidadeMaxima: number): Sala {
+    return new SalaDeAula(salaId, numeroSala, capacidadeMaxima);
   }
 }

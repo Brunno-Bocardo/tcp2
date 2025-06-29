@@ -71,18 +71,64 @@ export class SalaRepository extends AbstractSubject {
             }
         }
 
+        async filtrarSalaById(salaId: number): Promise<Sala> {
+        
+            const query = "SELECT * FROM Rooms where id = ?";
+    
+            try{
+                const resultado = await executarComandoSQL(query, [salaId]);
+                console.log("Sala filtrada com sucesso");
+                return new Promise<Sala>((resolve) => {
+                    resolve(resultado);
+                })
+            } catch (err: any) {
+                console.log("Erro ao filtrar sala: ", err);
+                throw err;
+            }
+        }
+
+        async atualizarSala(sala: Sala): Promise<Sala> {
+            const query = "UPDATE Rooms set numero = ?, capacidade_maxima = ?, tipo = ? where id = ?";
+
+            try {
+                const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo, sala.id])
+                console.log(`Sala com ID ${sala.id} atualizada com sucesso`);
+                return new Promise<Sala>((resolve) => {
+                    resolve(resultado);
+                })
+            } catch (err: any){
+                console.log(`Erro ao tentar atualizar sala com ID ${sala.id}`)
+                throw err;
+            }
+        }
+
+        async deletarSala(sala: Sala): Promise<Sala> {
+            const query = "DELETE FROM Rooms where id = ?";
+
+            try {
+                const resultado = await executarComandoSQL(query, [sala.id]);
+                console.log(`Sala com ID ${sala.id} deletada com sucesso`);
+                return new Promise<Sala>((resolve) => {
+                    resolve(resultado);
+                })
+            } catch (err: any) {
+                console.log(`Erro ao tentar deletar sala com ID ${sala.id}`);
+                throw err;
+            }
+        }
+
         async filtrarSalas(): Promise<Sala[]> {
         
             const query = "SELECT * FROM tcp2_db.Rooms";
     
             try{
                 const resultado = await executarComandoSQL(query, []);
-                console.log("Reservas filtradas com sucesso");
+                console.log("Salas filtradas com sucesso");
                 return new Promise<Sala[]>((resolve) => {
                     resolve(resultado);
                 })
             } catch (err: any) {
-                console.log("Erro ao filtrar reservas: ", err);
+                console.log("Erro ao filtrar salas: ", err);
                 throw err;
             }
         }

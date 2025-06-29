@@ -1,5 +1,6 @@
 import {Request, Response} from "express";
 import { UserService } from "../service/userService";
+import { jsonParaXmlAdapter } from "../patterns/adapter/adapter";
 
 const UsuarioService = new UserService();
 
