@@ -8,8 +8,8 @@ interface ReservasProps {
 type Sala = {
   id: number;
   numero: number;
-  capacidadeMaxima: number;
-  tipo: "Auditorio" | "Laboratorio" | "Sala de Aula";
+  capacidadeMaxima: number; // No backend é capacidade_maxima
+  tipo: string; // string genérico para aceitar qualquer valor do backend
 };
 
 type User = {
@@ -126,20 +126,10 @@ const HorarioDropdown: React.FC<HorarioDropdownProps> = ({
 };
 
 const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
-  const salas: Sala[] = [
-    // LISTA DE SALAS (EXEMPLO FICTICIO) - ESTAO PREDEFINIDAS NO FRONTEND
-    { id: 1, numero: 101, capacidadeMaxima: 100, tipo: "Auditorio" },
-    { id: 2, numero: 202, capacidadeMaxima: 25, tipo: "Laboratorio" },
-    { id: 3, numero: 303, capacidadeMaxima: 35, tipo: "Sala de Aula" },
-    { id: 4, numero: 404, capacidadeMaxima: 20, tipo: "Laboratorio" },
-  ];
-
-  // LISTA DE USUARIOS (EXEMPLO FICTICIO) - ESTAO PREDEFINIDAS NO FRONTEND
-  const users: User[] = [
-    { id: 1, nome: "Golden", email: "golden@gmail.com", curso: "ADS", senha: "1234@sdf", tipo: "Professor" },
-    { id: 2, nome: "Anisio", email: "anisio@gmail.com", curso: "ADS", senha: "1234@sdf2", tipo: "Professor" },
-    { id: 3, nome: "Marcelo Polido", email: "marcelo@gmail.com", curso: "ADS", senha: "1234@sdf22", tipo: "Coordenador" },
-  ];
+  // Substituir os arrays fixos por estados que serão carregados do backend
+  const [salas, setSalas] = useState<Sala[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
+  
   // HORARIOS FIXOS DISPONIVEIS PARA RESERVA
   const horariosDisponiveis = [
     "08:00",
@@ -163,15 +153,77 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
   const [horarioInicio, setHorarioInicio] = useState("");
   const [horarioFim, setHorarioFim] = useState("");
   const [loading, setLoading] = useState(false);
+  const [carregandoDados, setCarregandoDados] = useState(true);
+  const [reservasExistentes, setReservasExistentes] = useState<Reserva[]>([]);
 
-  // FUNCAO PRA PEGAR TODOS OS HORARIOS JA OCUPADOS NESSA SALA E DATA
+  // Efeito para carregar os dados do backend quando o componente montar
+  useEffect(() => {
+    async function carregarDados() {
+      setCarregandoDados(true);
+      try {
+        // Carregar salas do backend
+        const resSalas = await fetch("http://localhost:5000/api/salas");
+        if (resSalas.ok) {
+          const dadosSalas = await resSalas.json();
+          setSalas(dadosSalas);
+        } else {
+          console.error("Erro ao carregar salas");
+        }
+        
+        // Carregar usuários do backend
+        const resUsers = await fetch("http://localhost:5000/api/usuarios");
+        if (resUsers.ok) {
+          const dadosUsers = await resUsers.json();
+          setUsers(dadosUsers);
+        } else {
+          console.error("Erro ao carregar usuários");
+        }
+      } catch (error) {
+        console.error("Erro ao buscar dados:", error);
+      } finally {
+        setCarregandoDados(false);
+      }
+    }
+    
+    carregarDados();
+  }, []);
+
+  // Função para buscar reservas existentes
+  const buscarReservasExistentes = async (salaId: number, data: string) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/reservas/${salaId}/${data}`);
+      if (response.ok) {
+        const reservas = await response.json();
+        setReservasExistentes(reservas);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar reservas existentes:", error);
+    }
+  };
+
+  // Efeito para buscar reservas quando a sala ou data mudar
+  useEffect(() => {
+    if (salaSelecionada && dataDaReserva) {
+      buscarReservasExistentes(salaSelecionada, dataDaReserva);
+    }
+  }, [salaSelecionada, dataDaReserva]);
+
+  // Função para verificar horários ocupados
   const horariosOcupadosParaSalaData = (): string[] => {
     if (!salaSelecionada || !dataDaReserva) return [];
-    const reservasDaSalaData = reservas.filter(
-      (r) => r.salaId === salaSelecionada && r.dataDaReserva === dataDaReserva
-    );
+    
+    // Combinar reservas locais e existentes do banco
+    const todasReservas = [
+      ...reservas.filter(
+        (r) => r.salaId === salaSelecionada && r.dataDaReserva === dataDaReserva
+      ),
+      ...reservasExistentes.filter(
+        (r) => r.salaId === salaSelecionada && r.dataDaReserva === dataDaReserva
+      )
+    ];
+    
     const ocupados: string[] = [];
-    reservasDaSalaData.forEach((r) => {
+    todasReservas.forEach((r) => {
       const inicioIndex = horariosDisponiveis.indexOf(r.horarioInicio);
       const fimIndex = horariosDisponiveis.indexOf(r.horarioFim);
       if (inicioIndex !== -1 && fimIndex !== -1) {
@@ -235,6 +287,7 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
     setHorarioFim("");
   };
 
+  // Modificar a função enviarTodas para mostrar os resultados e limpar o estado após envio
   const enviarTodas = async () => {
     setLoading(true);
     setRespostas([]);
@@ -248,19 +301,44 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify(reserva),
         });
-        const data: Resposta = await res.json();
+        const data = await res.json();
         resultados.push(data);
       } catch (error) {
         console.error("ERRO AO ENVIAR:", error);
+        resultados.push({
+          status: "erro",
+          xml_enviado: "<erro>Falha na comunicação com o servidor</erro>"
+        });
       }
     }
 
     setRespostas(resultados);
+    
+    // Se todas as reservas forem bem-sucedidas, limpar o estado
+    if (resultados.every(r => r.status === "sucesso")) {
+      // Aguardar um pouco para o usuário ver a resposta
+      setTimeout(() => {
+        setReservas([]);
+      }, 3000);
+    }
+    
     setLoading(false);
   };
 
   const buscarSala = (id: number) => salas.find((s) => s.id === id);
   const buscarUser = (id: number) => users.find((u) => u.id === id);
+
+  // Mostrar um spinner ou mensagem enquanto os dados estão carregando
+  if (carregandoDados) {
+    return (
+      <div className="min-h-screen bg-[#1e1e2f] text-[#e0e0e0] flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-2 border-b-2 border-[#80cbc4] mx-auto mb-4"></div>
+          <p className="text-xl">Carregando dados...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <main className="min-h-screen bg-[#1e1e2f] text-[#e0e0e0] p-8 font-sans max-w-7xl mx-auto flex flex-col gap-8">
@@ -271,6 +349,10 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
             Bem-vindo, <span className="font-semibold">{nomeUsuario}</span>!
           </p>
         )}
+        {/* Coloquei o botão aqui apenas de modo provisório */}
+        <a href="#" className="bg-[#80cbc4] hover:bg-[#80cbd9] text-[#1e1e2f] font-bold py-3 px-12 rounded-xl shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed">
+          Logs
+        </a>
       </header>
 
       {/* FORMULARIO DE RESERVAS */}
@@ -414,18 +496,47 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
 
       {/* RESPOSTAS DO SERVIDOR */}
       {respostas.length > 0 && (
-        <section className="max-w-4xl mx-auto mt-6 bg-[#222238] rounded-lg p-4 overflow-auto max-h-56">
-          <h3 className="text-lg font-semibold mb-2">Respostas do Servidor:</h3>
-          {respostas.map((resp, i) => (
-            <pre
-              key={i}
-              className="whitespace-pre-wrap bg-[#1b1b30] p-3 rounded mb-3 text-sm text-[#80cbc4] border border-[#80cbc4]"
-            >
-              STATUS: {resp.status}
-              {"\n"}
-              XML ENVIADO: {resp.xml_enviado}
-            </pre>
-          ))}
+        <section className="max-w-4xl mx-auto mt-6 bg-[#222238] rounded-lg p-4 overflow-auto max-h-80">
+          <h3 className="text-lg font-semibold mb-2">
+            Resultado do processamento das reservas:
+          </h3>
+          <div className="space-y-4">
+            {respostas.map((resp, i) => {
+              const isSuccess = resp.status === "sucesso";
+              return (
+                <div 
+                  key={i}
+                  className={`p-4 rounded-lg border ${
+                    isSuccess 
+                      ? "bg-[#1e3b2f] border-green-500 text-green-200" 
+                      : "bg-[#3b1e1e] border-red-500 text-red-200"
+                  }`}
+                >
+                  <div className="flex items-center mb-2">
+                    <div className={`w-4 h-4 rounded-full mr-2 ${isSuccess ? "bg-green-500" : "bg-red-500"}`}></div>
+                    <span className="font-semibold">
+                      {isSuccess ? "Reserva realizada com sucesso!" : "Falha ao processar reserva"}
+                    </span>
+                  </div>
+                  <div className="mt-2">
+                    <details className="cursor-pointer">
+                      <summary className="text-sm font-medium">Ver detalhes do XML</summary>
+                      <pre className="whitespace-pre-wrap bg-[#1b1b30] p-3 mt-2 rounded text-xs">
+                        {resp.xml_enviado}
+                      </pre>
+                    </details>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          {respostas.every(r => r.status === "sucesso") && (
+            <div className="mt-4 p-3 bg-green-800 bg-opacity-20 border border-green-500 rounded-lg text-center">
+              <p className="text-green-200">
+                Todas as reservas foram processadas com sucesso!
+              </p>
+            </div>
+          )}
         </section>
       )}
     </main>
