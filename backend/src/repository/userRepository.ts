@@ -1,11 +1,18 @@
 import { executarComandoSQL } from "../database/mysql";
 import { User } from "../model/interfaces/IUser";
+import { AbstractSubject } from "../patterns/observer/AbstractSubject";
+import { LoggerObserver } from "../patterns/observer/LoggerObserver";
 
-export class UserRepository {
+export class UserRepository extends AbstractSubject {
   private static instance: UserRepository;
 
-  constructor() {
+  private constructor() {
+    super();
     this.createTable();
+    
+    // Adicionar o LoggerObserver como observador
+    const logger = LoggerObserver.getInstance();
+    this.attach(logger);
   }
 
   public static getInstance(): UserRepository {
@@ -51,11 +58,27 @@ export class UserRepository {
       ]);
       console.log("Usuario cadastrado com sucesso");
       user.id = resultado.insertId;
-      return new Promise<User>((resolve) => {
-        resolve(user);
+      
+      // Notificar observadores sobre a criação do usuário
+      this.notify('criar_usuario', {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        curso: user.curso,
+        tipo: user.tipo
       });
+      
+      return user;
     } catch (err: any) {
       console.error("Erro ao cadastrar Usuário: ", err);
+      
+      // Notificar observadores sobre o erro
+      this.notify('erro_criar_usuario', {
+        nome: user.nome,
+        email: user.email,
+        erro: err.message
+      });
+      
       throw err;
     }
   }
@@ -106,6 +129,19 @@ export class UserRepository {
       }
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
+      throw err;
+    }
+  }
+
+  async listarUsuarios(): Promise<User[]> {
+    let query = "SELECT * FROM tcp2_db.Users";
+
+    try {
+      const resultado = await executarComandoSQL(query, []);
+      console.log("Usuários buscados com sucesso");
+      return resultado;
+    } catch (err: any) {
+      console.error(`Falha ao listar usuários: ${err}`);
       throw err;
     }
   }

@@ -1,11 +1,18 @@
 import { executarComandoSQL } from "../database/mysql";
 import { Sala } from "../model/interfaces/ISala";
+import { AbstractSubject } from "../patterns/observer/AbstractSubject";
+import { LoggerObserver } from "../patterns/observer/LoggerObserver";
 
-export class SalaRepository {
+export class SalaRepository extends AbstractSubject {
     private static instance : SalaRepository;
 
     private constructor(){
+            super();
             this.createTable();
+            
+            // Adicionar o LoggerObserver como observador
+            const logger = LoggerObserver.getInstance();
+            this.attach(logger);
         }
     
         public static getInstance(): SalaRepository {
@@ -35,24 +42,39 @@ export class SalaRepository {
         }
 
         async cadastrarSala(sala: Sala): Promise<Sala> {
-            const query = "INSERT INTO Rooms (numero, capacidade_maxima, tipo) VALUES (?,?,?)";
-        
+            const query = "INSERT INTO tcp2_db.Rooms (numero, capacidade_maxima, tipo) VALUES (?,?,?)";
+
             try{
                 const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo]);
-                console.log("Reserva registrada com sucesso");
+                console.log("Sala cadastrada com sucesso");
                 sala.id = resultado.insertId;
-                return new Promise<Sala>((resolve) => {
-                    resolve(sala);
-                })
+                
+                // Notificar observadores sobre a criação da sala
+                this.notify('criar_sala', {
+                    id: sala.id,
+                    numero: sala.numero,
+                    capacidadeMaxima: sala.capacidadeMaxima,
+                    tipo: sala.tipo
+                });
+                
+                return sala;
             } catch (err: any) {
                 console.log("Erro ao cadastrar sala: ", err);
+                
+                // Notificar observadores sobre o erro
+                this.notify('erro_criar_sala', {
+                    numero: sala.numero,
+                    tipo: sala.tipo,
+                    erro: err.message
+                });
+                
                 throw err;
             }
         }
 
         async filtrarSalas(): Promise<Sala[]> {
         
-            const query = "SELECT * FROM Rooms";
+            const query = "SELECT * FROM tcp2_db.Rooms";
     
             try{
                 const resultado = await executarComandoSQL(query, []);
