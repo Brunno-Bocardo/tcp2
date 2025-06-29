@@ -1,7 +1,7 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
 import { jsonParaXmlAdapter } from "./patterns/adapter/adapter";
-import { IReserva } from "./model/interfaces/IReserva";
+import { IReserva } from "./model/interfaces/ireserva";
 import { ProxyLogin } from "./patterns/proxy/ProxyLogin";
 import { cadastrarUsuario } from "./controller/userControl";
 import { ReservaRepository } from "./repository/reservaRepository";
@@ -78,17 +78,17 @@ function backendLegado(xml: string) {
 }
 
 // ENDPOINTS RESERVA
-app.post("/api/reservaSala", reservarSala)
+// app.post("/api/reservaSala", reservarSala)
 
 // ENDPOINTS RESERVA
-app.post("/api/user", cadastrarUsuario)
+// app.post("/api/user", cadastrarUsuario)
 
 // ENDPOINTS SALA
-app.post("/api/sala", cadastrarSala)
-app.get("/api/sala", filtrarSala)
-app.put("/api/sala", atualizarSala)
-app.delete("/api/sala", excluirSala)
-app.get("/api/salas", filtrarSalas)
+// app.post("/api/sala", cadastrarSala)
+// app.get("/api/sala", filtrarSala)
+// app.put("/api/sala", atualizarSala)
+// app.delete("/api/sala", excluirSala)
+// app.get("/api/salas", filtrarSalas)
 
 // ENDPOINT DE RESERVA
 app.post("/api/reserva", (req: Request, res: Response) => {
@@ -98,6 +98,7 @@ app.post("/api/reserva", (req: Request, res: Response) => {
   const xml = jsonParaXmlAdapter(dados); // <- AQUI O ADAPTER AGE
 
   backendLegado(xml);
+});
 
 // ========================= ROTAS =========================
 
@@ -204,8 +205,7 @@ app.post("/api/reserva", async (req: Request, res: Response): Promise<void> => {
     const reservaData = req.body;
 
     // Validar dados recebidos
-    if (!reservaData.userId || !reservaData.salaId || !reservaData.dataDaReserva ||
-      !reservaData.horarioInicio || !reservaData.horarioFim) {
+    if (!reservaData.userId || !reservaData.salaId || !reservaData.dataDaReserva || !reservaData.horarioInicio || !reservaData.horarioFim) {
       res.status(400).json({
         status: "erro",
         message: "Dados da reserva incompletos"

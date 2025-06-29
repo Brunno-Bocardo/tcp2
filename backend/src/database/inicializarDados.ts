@@ -26,16 +26,16 @@ export async function inicializarTabelasEDados() {
     console.log("Inicializando tabelas...");
     
     // Primeiro criar todas as tabelas
-    const userRepo = UserRepository.getInstance();
+    UserRepository.getInstance();
     await new Promise(resolve => setTimeout(resolve, 2500)); // Pequena pausa para garantir que a tabela foi criada
     
-    const salaRepo = SalaRepository.getInstance();
+    SalaRepository.getInstance();
     await new Promise(resolve => setTimeout(resolve, 2500));
     
-    const reservaRepo = ReservaRepository.getInstance();
+    ReservaRepository.getInstance();
     await new Promise(resolve => setTimeout(resolve, 2500));
     
-    const logRepo = LogRepository.getInstance();
+    LogRepository.getInstance();
     await new Promise(resolve => setTimeout(resolve, 2500));
     
     console.log("Tabelas inicializadas com sucesso!");
@@ -96,10 +96,10 @@ async function inicializarSalasPadrao() {
     const criadorLaboratorio = new CriadorLaboratorio();
     const criadorSalaDeAula = new CriadorSalaDeAula();
     const salas_padrao = [
-        criadorAuditorio.criarSala(101, 100),
-        criadorLaboratorio.criarSala(202, 25),
-        criadorSalaDeAula.criarSala(303, 35),
-        criadorLaboratorio.criarSala(404, 20)
+        criadorAuditorio.criarSala(0, 101, 100),
+        criadorLaboratorio.criarSala(1, 202, 25),
+        criadorSalaDeAula.criarSala(2, 303, 35),
+        criadorLaboratorio.criarSala(3, 404, 20)
     ];
     
     // Inserir salas no banco

@@ -5,16 +5,17 @@ import { UserRepository } from "../repository/userRepository";
 import { SalaRepository } from "../repository/salaRepository";
 
 export class ReservaService {
-    private ReservaRepository = ReservaRepository.getInstance();
-    private UserRepository = UserRepository.getInstance();
-    private SalaRepository = SalaRepository.getInstance();
+    private reservaRepository = ReservaRepository.getInstance();
+    private userRepository = UserRepository.getInstance();
+    private salaRepository = SalaRepository.getInstance();
+    
 
-    async registrarReserva(reservaData: any): Promise<Reserva> {
+    async registrarReserva(reservaData: any): Promise<void> {
 
         const {userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
 
-        const user = await this.UserRepository.filtraUsuarioById(userId);
-        const sala = await this.SalaRepository.filtrarSalaById(salaId)
+        const user = await this.userRepository.filtraUsuarioById(userId);
+        const sala = await this.salaRepository.filtrarSalaById(salaId)
 
         if(!user){
             throw new Error(`Usuário com ID ${userId} não encontrado.`);
@@ -23,16 +24,26 @@ export class ReservaService {
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
-        const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim);
+        // const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim);
 
-        console.log(`${reserva.dataDaReserva, reserva.dataDaSolicitacao, reserva.horarioInicio, reserva.horarioFim}`);
+        const reserva = {
+            userId: userId,
+            salaId: salaId,
+            dataDaSolicitacao: dataSolicitacao,
+            dataDaReserva: dataReserva,
+            horarioInicio: horarioInicio,
+            horarioFim: horarioFim
+        }
+
+        // console.log(`${reserva.dataDaReserva, reserva.dataDaSolicitacao, reserva.horarioInicio, reserva.horarioFim}`);
 
          //Incluir verificações antes de registrar reserva
 
-        const reservaRegistrada = await this.ReservaRepository.registrarReserva(reserva);
+        const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
         console.log('Reserva registrada: ', reservaRegistrada);
-        return new Promise<Reserva>((resolve) => {
-            resolve(reservaRegistrada);
-        });
+        // TODO: Corrigir esse return e o tipo de retorno do método registrarReserva -> Reserva 
+        // return new Promise<Reserva>((resolve) => {
+        //     resolve(reservaRegistrada);
+        // });
     }
 }

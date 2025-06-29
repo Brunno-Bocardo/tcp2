@@ -58,6 +58,23 @@ export class ReservaRepository extends AbstractSubject {
     }
   }
 
+  // async registrarReserva(reserva: Reserva): Promise<Reserva> {
+
+  //       const query = "INSERT INTO Reservations (user_id, sala_id, data_da_solicitacao, data_da_reserva, horario_de_inicio, horario_de_fim) VALUES (?,?,?,?,?,?)";
+
+  //       try{
+  //           const resultado = await executarComandoSQL(query, [reserva.userId, reserva.salaId, reserva.dataDaSolicitacao, reserva.dataDaReserva, reserva.horarioInicio, reserva.horarioFim]);
+  //           console.log("Reserva registrada com sucesso");
+  //           reserva.id = resultado.insertId;
+  //           return new Promise<Reserva>((resolve) => {
+  //               resolve(reserva);
+  //           })
+  //       } catch (err: any) {
+  //           console.log("Erro ao registrar reserva: ", err);
+  //           throw err;
+  //       }
+  //   }
+
   async inserirReserva(reserva: Reserva): Promise<Reserva> {
     const query = `
       INSERT INTO tcp2_db.Reservations 
@@ -66,32 +83,34 @@ export class ReservaRepository extends AbstractSubject {
     `;
 
     try {
-      const resultado = await executarComandoSQL(query, [
-        reserva.userId,
-        reserva.salaId,
-        reserva.dataDaSolicitacao,
-        reserva.dataDaReserva,
-        reserva.horarioInicio,
-        reserva.horarioFim
-      ]);
-      console.log("Reserva cadastrada com sucesso");
-      
-      reserva.id = resultado.insertId;
-      
-      // Notificar observadores sobre a criação da reserva
-      this.notify('criar_reserva', reserva, reserva.userId);
-      
-      return reserva;
+        const resultado = await executarComandoSQL(query, [
+            reserva.userId,
+            reserva.salaId,
+            reserva.dataDaSolicitacao,
+            reserva.dataDaReserva,
+            reserva.horarioInicio,
+            reserva.horarioFim
+        ]);
+        console.log("Reserva cadastrada com sucesso");
+        
+        reserva.id = resultado.insertId;
+        
+        // Notificar observadores sobre a criação da reserva
+        this.notify('criar_reserva', reserva, reserva.userId);
+        
+        return new Promise<Reserva>((resolve) => {
+            resolve(reserva);
+        })
     } catch (err: any) {
-      console.error("Erro ao cadastrar reserva:", err);
-      
-      // Notificar observadores sobre o erro
-      this.notify('erro_criar_reserva', {
-        ...reserva,
-        erro: err.message
-      }, reserva.userId);
-      
-      throw err;
+        console.error("Erro ao cadastrar reserva:", err);
+        
+        // Notificar observadores sobre o erro
+        this.notify('erro_criar_reserva', {
+            ...reserva,
+            erro: err.message
+        }, reserva.userId);
+        
+        throw err;
     }
   }
 
