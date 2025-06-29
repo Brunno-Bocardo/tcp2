@@ -1,7 +1,5 @@
-import { CoordenadorFactory } from "../model/abstractFactory/coordenadorFactory";
-import { ProfessorFactory } from "../model/abstractFactory/professorFactory";
-import { Coordenador } from "../model/classes/coordenador";
-import { Professor } from "../model/classes/professor";
+import { CoordenadorFactory } from "../patterns/abstractFactory/coordenadorFactory";
+import { ProfessorFactory } from "../patterns/abstractFactory/professorFactory";
 import { User } from "../model/interfaces/IUser";
 import { UserRepository } from "../repository/userRepository";
 
@@ -26,20 +24,10 @@ export class UserService {
     });
   }
 
-  // async verificarUsuario(userData:any): Promise<User> {
-  //   const {nome, senha} = userData;
-
-  //   const bancoUser = await this.UsuarioRepository.filtraUsuarioByName(nome);
-    
-  //   if(bancoUser.senha == senha){
-
-  //   }
-
-  // }
 
 
-  async userLogin(userData: any): Promise<User> {
-    const { email, senha } = userData;
+  async userLogin(email: string, senha: string): Promise<User> {
+    console.log(email);
     const usuario = await this.UsuarioRepository.filtraUsuarioByEmail(email);
 
     if (!usuario) {
