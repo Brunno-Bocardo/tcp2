@@ -34,8 +34,7 @@ export class SalaRepository extends AbstractSubject {
                     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
                 )`;
             try {
-                const resultado = await executarComandoSQL(query, []);
-                console.log("Query executada com sucesso", resultado);
+                await executarComandoSQL(query, []);
             } catch (err) {
                 console.error("Error");
             }

@@ -33,6 +33,7 @@ export class ReservaRepository extends AbstractSubject {
   }
 
   private async createTable() {
+
     const query = `
     CREATE TABLE IF NOT EXISTS tcp2_db.Reservations
         (
@@ -51,7 +52,6 @@ export class ReservaRepository extends AbstractSubject {
 
     try {
       await executarComandoSQL(query, []);
-      console.log("Tabela Reservas criada ou já existente");
     } catch (err) {
       console.error("Erro ao criar tabela Reservas:", err);
       throw err;

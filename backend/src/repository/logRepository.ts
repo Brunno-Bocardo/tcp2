@@ -37,7 +37,6 @@ export class LogRepository {
 
     try {
       const resultado = await executarComandoSQL(query, []);
-      console.log("Tabela Logs criada ou já existente");
     } catch (err) {
       console.error("Erro ao criar tabela Logs:", err);
       throw err;

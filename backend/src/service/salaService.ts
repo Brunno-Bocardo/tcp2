@@ -15,7 +15,7 @@ export class SalaService {
 
             let sala: Sala;
 
-            //method factory
+            // method factory
             if(tipo === "Auditorio"){
                 sala = this.CriadorAuditorio.criarSala(numero, capacidadeMaxima);
             } else if (tipo === "Laboratorio") {
@@ -24,7 +24,7 @@ export class SalaService {
                 sala = this.CriadorSalaDeAula.criarSala(numero, capacidadeMaxima);
             }
     
-            //Incluir verificações antes de registrar reserva
+            // Incluir verificações antes de registrar reserva
             
             const salaRegistrada = await this.salaRepository.cadastrarSala(sala);
             console.log("Sala Cadastrada", salaRegistrada)

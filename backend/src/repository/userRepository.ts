@@ -37,8 +37,7 @@ export class UserRepository extends AbstractSubject {
         )`;
 
     try {
-      const resultado = await executarComandoSQL(query, []);
-      console.log("Query executada com sucesso: ", resultado);
+      await executarComandoSQL(query, []);
     } catch (err) {
       console.error("Error");
     }

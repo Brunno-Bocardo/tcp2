@@ -15,7 +15,6 @@ export abstract class AbstractSubject implements ISubject {
     const isExist = this.observers.includes(observer);
     if (!isExist) {
       this.observers.push(observer);
-      console.log('Observer adicionado com sucesso');
     } else {
       console.log('Observer já existe na lista');
     }
