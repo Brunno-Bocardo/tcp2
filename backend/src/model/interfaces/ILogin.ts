@@ -1,3 +1,6 @@
+import { LoginRequestDto } from "../dto/LoginRequestDto";
+import { User } from "./IUser";
+
 export interface ILogin {
-    login(usuario: string, senha: string): Promise<boolean>;
+    login(userData: LoginRequestDto): Promise<User>;
 }

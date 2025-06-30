@@ -114,7 +114,7 @@ export class UserRepository extends AbstractSubject {
   
 
   async filtraUsuarioByEmail(email?: string): Promise<User | undefined> {
-    let query = "SELECT * FROM tcp2_db.users where email = ?";
+    let query = "SELECT * FROM tcp2_db.Users where email = ?";
     
     console.log("Email, ", email);
 

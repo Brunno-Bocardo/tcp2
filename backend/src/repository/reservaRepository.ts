@@ -1,17 +1,8 @@
 import { executarComandoSQL } from "../database/mysql";
+import { Reserva } from "../model/classes/Reserva";
 import { AbstractSubject } from "../patterns/observer/AbstractSubject";
 import { LoggerObserver } from "../patterns/observer/LoggerObserver";
 
-// Interface para Reserva
-export interface Reserva {
-  id?: number;
-  userId: number;
-  salaId: number;
-  dataDaSolicitacao: string;
-  dataDaReserva: string;
-  horarioInicio: string;
-  horarioFim: string;
-}
 
 export class ReservaRepository extends AbstractSubject {
   private static instance: ReservaRepository;
@@ -58,23 +49,6 @@ export class ReservaRepository extends AbstractSubject {
     }
   }
 
-  // async registrarReserva(reserva: Reserva): Promise<Reserva> {
-
-  //       const query = "INSERT INTO Reservations (user_id, sala_id, data_da_solicitacao, data_da_reserva, horario_de_inicio, horario_de_fim) VALUES (?,?,?,?,?,?)";
-
-  //       try{
-  //           const resultado = await executarComandoSQL(query, [reserva.userId, reserva.salaId, reserva.dataDaSolicitacao, reserva.dataDaReserva, reserva.horarioInicio, reserva.horarioFim]);
-  //           console.log("Reserva registrada com sucesso");
-  //           reserva.id = resultado.insertId;
-  //           return new Promise<Reserva>((resolve) => {
-  //               resolve(reserva);
-  //           })
-  //       } catch (err: any) {
-  //           console.log("Erro ao registrar reserva: ", err);
-  //           throw err;
-  //       }
-  //   }
-
   async inserirReserva(reserva: Reserva): Promise<Reserva> {
     const query = `
       INSERT INTO tcp2_db.Reservations 
@@ -91,8 +65,7 @@ export class ReservaRepository extends AbstractSubject {
             reserva.horarioInicio,
             reserva.horarioFim
         ]);
-        console.log("Reserva cadastrada com sucesso");
-        
+        console.log("Reserva inserida com sucesso");
         reserva.id = resultado.insertId;
         
         // Notificar observadores sobre a criação da reserva
@@ -114,27 +87,31 @@ export class ReservaRepository extends AbstractSubject {
     }
   }
 
+  async listarReservasPorSalaEData(salaId: number, data: string): Promise<Reserva[]> {
+    const query = "SELECT * FROM tcp2_db.Reservations WHERE sala_id = ? AND data_da_reserva = ?";
+    try {
+      const resultado = await executarComandoSQL(query, [salaId, data]);
+      return new Promise<Reserva[]>((resolve) => {
+        resolve(resultado);
+      })
+    } catch (err: any) {
+      console.error("Erro ao listar reservas por sala e data");
+      throw err;
+    }
+  }
+
   async listarReservas(): Promise<Reserva[]> {
     const query = "SELECT * FROM tcp2_db.Reservations";
 
     try {
       const resultado = await executarComandoSQL(query, []);
       console.log("Reservas listadas com sucesso");
-      return resultado as Reserva[];
-    } catch (err) {
-      console.error("Erro ao listar reservas:", err);
-      return [];
-    }
-  }
-
-  async listarReservasPorSalaEData(salaId: number, data: string): Promise<Reserva[]> {
-    const query = "SELECT * FROM tcp2_db.Reservations WHERE sala_id = ? AND data_da_reserva = ?";
-    try {
-      const resultado = await executarComandoSQL(query, [salaId, data]);
-      return resultado as Reserva[];
-    } catch (err) {
-      console.error("Erro ao listar reservas por sala e data:", err);
-      return [];
+      return new Promise<Reserva[]>((resolve) => {
+        resolve(resultado);
+      })
+    } catch (err: any) {
+      console.error("Erro ao listar reservas");
+      throw err;
     }
   }
 }

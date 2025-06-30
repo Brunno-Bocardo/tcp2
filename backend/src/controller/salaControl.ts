@@ -4,8 +4,6 @@ import { CommandExecuter } from "../patterns/commands/CommandExecuter";
 import { SalaCadastrarCommand } from "../patterns/commands/SalaCadastrarCommand";
 import { SalaAtualizarCommand } from "../patterns/commands/SalaAtualizarCommand";
 import { SalaExcluirCommand } from "../patterns/commands/SalaExcluirCommand";
-import { SalaFiltrarCommand } from "../patterns/commands/SalaFiltrarCommand";
-import { SalasFiltrarCommand } from "../patterns/commands/SalasFiltrarCommand";
 
 const salaService = new SalaService();
 const executor = new CommandExecuter();
@@ -28,10 +26,8 @@ export async function cadastrarSala(req: Request, res: Response) {
 }
 
 export async function filtrarSala(req: Request, res: Response) {
-    const command = new SalaFiltrarCommand(salaService, req.query.id)
-
     try {
-        const sala = await executor.run(command);
+        const sala = await salaService.filtrarSalaPorId(req.query.id as string)
         res.status(200).json(
             {
                 mensagem: "Sala filtrada com sucesso!",
@@ -76,17 +72,13 @@ export async function excluirSala(req: Request, res: Response) {
 }
 
 export async function filtrarSalas(req: Request, res: Response) {
-    const command = new SalasFiltrarCommand(salaService)
-
     try {
-        const sala = await executor.run(command);
-        res.status(200).json(
-            {
-                mensagem: "Salas filtradas com sucesso!",
-                sala: sala
-            }
-        )
+        const salas = await salaService.filtrarSalas();
+        res.status(200).json({
+            mensagem: "Salas encontradas com sucesso",
+            salas: salas
+        });
     } catch (error:any){
-        res.status(400).json({message:error.message})
+        res.status(500).json({error: "Erro ao buscar salas"});
     }
 }

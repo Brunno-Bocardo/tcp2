@@ -1,13 +1,5 @@
 import { executarComandoSQL } from "../database/mysql";
-
-export interface Log {
-  id?: number;
-  evento: string;
-  descricao: string;
-  usuario_id?: number;
-  data_hora: Date;
-  dados: string;
-}
+import { ILog } from "../model/interfaces/ILog";
 
 export class LogRepository {
   private static instance: LogRepository;
@@ -36,14 +28,14 @@ export class LogRepository {
       )`;
 
     try {
-      const resultado = await executarComandoSQL(query, []);
+      await executarComandoSQL(query, []);
     } catch (err) {
       console.error("Erro ao criar tabela Logs:", err);
       throw err;
     }
   }
 
-  async inserirLog(log: Log): Promise<Log> {
+  async inserirLog(log: ILog): Promise<ILog> {
     const query = `
       INSERT INTO tcp2_db.Logs 
       (evento, descricao, usuario_id, dados)
@@ -67,23 +59,22 @@ export class LogRepository {
     }
   }
 
-  async listarLogs(limite: number = 100, offset: number = 0): Promise<Log[]> {
+  async listarLogs(limite: number, offset: number): Promise<ILog[]> {
     const query = `
-      SELECT * FROM tcp2_db.Logs 
-      ORDER BY data_hora DESC 
-      LIMIT ? OFFSET ?
-    `;
+      SELECT * FROM tcp2_db.Logs ORDER BY data_hora DESC LIMIT ${Number(limite)} OFFSET ${Number(offset)}`;
 
     try {
-      const logs = await executarComandoSQL(query, [limite, offset]);
-      return logs as Log[];
+      const logs = await executarComandoSQL(query, []);
+      return new Promise<ILog[]>((resolve) => {
+        resolve(logs);
+      })
     } catch (err) {
-      console.error("Erro ao listar logs:", err);
-      return [];
+      console.error("Erro ao listar logs");
+      throw err;
     }
   }
 
-  async buscarLogsPorEvento(evento: string): Promise<Log[]> {
+  async buscarLogsPorEvento(evento: string): Promise<ILog[]> {
     const query = `
       SELECT * FROM tcp2_db.Logs 
       WHERE evento = ?
@@ -92,14 +83,16 @@ export class LogRepository {
 
     try {
       const logs = await executarComandoSQL(query, [evento]);
-      return logs as Log[];
+      return new Promise<ILog[]>((resolve) => {
+        resolve(logs);
+      })
     } catch (err) {
-      console.error("Erro ao buscar logs por evento:", err);
-      return [];
+      console.error("Erro ao buscar logs por evento");
+      throw err;
     }
   }
 
-  async buscarLogsPorUsuario(usuarioId: number): Promise<Log[]> {
+  async buscarLogsPorUsuario(usuarioId: number): Promise<ILog[]> {
     const query = `
       SELECT * FROM tcp2_db.Logs 
       WHERE usuario_id = ?
@@ -108,10 +101,12 @@ export class LogRepository {
 
     try {
       const logs = await executarComandoSQL(query, [usuarioId]);
-      return logs as Log[];
+      return new Promise<ILog[]>((resolve) => {
+        resolve(logs);
+      })
     } catch (err) {
-      console.error("Erro ao buscar logs por usuário:", err);
-      return [];
+      console.error("Erro ao buscar logs por usuário");
+      throw err;
     }
   }
 }

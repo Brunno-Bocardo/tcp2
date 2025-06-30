@@ -1,4 +1,4 @@
-import { SalaDeAula } from "../../model/classes/SalaDeAula";
+import { SalaDeAula } from "../../model/classes/salaDeAula";
 import { Sala } from "../../model/interfaces/ISala";
 import { CriadorSala } from "./CriadorSala";
 

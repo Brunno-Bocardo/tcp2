@@ -1,5 +1,6 @@
 import { IObserver } from "./IObserver";
-import { LogRepository, Log } from "../../repository/logRepository";
+import { LogRepository } from "../../repository/logRepository";
+import { ILog } from "../../model/interfaces/ILog";
 
 export class LoggerObserver implements IObserver {
     private static instance: LoggerObserver;
@@ -28,7 +29,7 @@ export class LoggerObserver implements IObserver {
             const dadosSerializados = JSON.stringify(dados);
             
             // Criar objeto de log
-            const log: Log = {
+            const log: ILog = {
                 evento,
                 descricao,
                 usuario_id: usuarioId,

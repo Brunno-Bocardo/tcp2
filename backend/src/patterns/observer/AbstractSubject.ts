@@ -1,7 +1,6 @@
 import { IObserver } from "./IObserver";
 import { ISubject } from "./ISubject";
 
-
 // Classe abstrata que implementa os métodos básicos de Subject
 // Fornece uma implementação padrão para gerenciar e notificar observadores
 export abstract class AbstractSubject implements ISubject {

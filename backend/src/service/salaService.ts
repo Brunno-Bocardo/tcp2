@@ -37,13 +37,20 @@ export class SalaService {
         });
     }
 
-    async filtrarSalaPorId(id:any): Promise<Sala>{
+    async filtrarSalaPorId(salaId: string): Promise<Sala>{
 
-        if(!id){
-            throw new Error(`ID ${id} inválido`)
+        if(!salaId){
+            throw new Error(`ID ${salaId} inválido`)
         }
+        
+        const id = parseInt(salaId);
 
         const sala = await this.salaRepository.filtrarSalaById(id)
+
+        if(!sala) {
+            throw new Error("Sala não localizada");
+        }
+
         console.log("Sala encontrada com sucesso");
         return new Promise<Sala>((resolve) => {
             resolve(sala)
@@ -113,9 +120,7 @@ export class SalaService {
 
     async filtrarSalas(): Promise<Sala[]> {
         const salas = await this.salaRepository.filtrarSalas();
-        console.log("Salas filtradas");
-        return new Promise<Sala[]>((resolve) => {
-            resolve(salas)
-        });
+        console.log("Salas filtradas", salas);
+        return salas;
     }
 }

@@ -1,4 +1,5 @@
-import { Auditorio } from "../../model/classes/Auditorio";
+
+import { Auditorio } from "../../model/classes/auditorio";
 import { Sala } from "../../model/interfaces/ISala";
 import { CriadorSala } from "./CriadorSala";
 
