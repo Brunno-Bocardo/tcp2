@@ -7,8 +7,9 @@ export class CoordenadorFactory implements UserFactory {
     nome: string,
     email: string,
     curso: string,
-    senha: string
+    senha: string,
+    id?: number,
   ): User {
-    return new Coordenador(undefined, nome, email, curso, senha);
+    return new Coordenador(id, nome, email, curso, senha);
   }
 }

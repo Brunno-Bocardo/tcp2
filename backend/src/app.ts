@@ -6,7 +6,7 @@ import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
 import { inicializarSistema } from "./database/inicializarDados";
 import { reservarSala, verificarReservas } from "./controller/reservaControl";
-import { cadastrarUsuario, filtrarUsuarios, verificarUsuario } from "./controller/userControl";
+import { atualizarUsuario, cadastrarUsuario, deletarUsuario, filtrarUsuario, filtrarUsuarios, verificarUsuario } from "./controller/userControl";
 import { atualizarSala, cadastrarSala, excluirSala, filtrarSala, filtrarSalas } from "./controller/salaControl";
 import { filtrarLogs } from "./controller/logControl";
 
@@ -39,18 +39,23 @@ inicializarSistema();
 
 // ========================= ROTAS =========================
 
+// Alguns endpoins estão retornando objetos vazios (não existem no banco), o próximo passo seria validar o retorno do banco, tirando isso está funcionando. Os endpoints com ok foram testados.
+
 // ENDPOINTS RESERVA
 app.post("/api/reserva", reservarSala) //ok
 app.get("/api/reservas/:salaId/:data", verificarReservas) //ok
 
-// ENDPOINTS USUÁRIO
+// ENDPOINTS USUÁRIO - CRUD COMPLETO
 app.post("/api/user", cadastrarUsuario) //ok
+app.get("/api/user", filtrarUsuario) //ok
+app.put("/api/user", atualizarUsuario) //ok
+app.delete("/api/user", deletarUsuario) //ok
 app.post("/api/login", verificarUsuario) //ok
 app.get("/api/usuarios", filtrarUsuarios) //ok
 
-// ENDPOINTS SALA
+// ENDPOINTS SALA - CRUD COMPLETO
 app.post("/api/sala", cadastrarSala) //ok
-app.get("/api/sala", filtrarSala) // filtrar sala by id funciona, no entanto, se a sala não existe ele retorna um objeto vazio 
+app.get("/api/sala", filtrarSala) //ok
 app.put("/api/sala", atualizarSala) //ok
 app.delete("/api/sala", excluirSala) //ok
 app.get("/api/salas", filtrarSalas) //ok

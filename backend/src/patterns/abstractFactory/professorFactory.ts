@@ -7,8 +7,9 @@ export class ProfessorFactory implements UserFactory {
     nome: string,
     email: string,
     curso: string,
-    senha: string
+    senha: string,
+    id?: number,
   ): User {
-    return new Professor(undefined, nome, email, curso, senha);
+    return new Professor(id, nome, email, curso, senha);
   }
 }
