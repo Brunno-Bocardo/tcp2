@@ -36,6 +36,15 @@ async function inicializarTabelas() {
 // Inicializa o sistema de forma sequencial
 inicializarSistema();
 
+// ========================= CONFIG =========================
+
+// CONFIGURA CORS PRA PERMITIR O FRONT
+app.use(cors({
+    origin: "http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 
 // ========================= ROTAS =========================
 
@@ -62,13 +71,3 @@ app.get("/api/salas", filtrarSalas) //ok
 
 // ENDPOINT LOGS
 app.get("/api/logs", filtrarLogs) //ok
-
-// ========================= CONFIG =========================
-
-// CONFIGURA CORS PRA PERMITIR O FRONT
-app.use(cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);

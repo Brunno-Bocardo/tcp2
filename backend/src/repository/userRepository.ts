@@ -89,7 +89,7 @@ export class UserRepository extends AbstractSubject {
       const resultado = await executarComandoSQL(query, [id]);
       console.log("Busca efetuada com sucesso: ", resultado);
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       });
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
@@ -104,10 +104,9 @@ export class UserRepository extends AbstractSubject {
 
     try {
       const resultado = await executarComandoSQL(query, [email]);
-      console.log("Busca efetuada com sucesso: ", resultado);
       
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       });
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
@@ -122,7 +121,7 @@ export class UserRepository extends AbstractSubject {
       const resultado = await executarComandoSQL(query, [name]);
       console.log("Busca efetuada com sucesso: ", resultado);
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       });
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
@@ -147,7 +146,7 @@ export class UserRepository extends AbstractSubject {
       });
 
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       })
     } catch (erro: any){
       console.log(`Erro ao tentar atualizar o usuário com ID ${user.id}`);
@@ -180,7 +179,7 @@ export class UserRepository extends AbstractSubject {
       });
 
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       })
     } catch (erro: any){
       console.log(`Erro ao tentar deletar o usuário com ID ${user.id}`);

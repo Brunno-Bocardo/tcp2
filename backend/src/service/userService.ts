@@ -41,6 +41,8 @@ export class UserService {
       throw new Error("Senha incorreta");
     }
 
+    console.log(`Usuario: ${usuario}`)
+
     return new Promise<User>((resolve) => {
       resolve(usuario);
     });
@@ -53,9 +55,9 @@ export class UserService {
     
     const usuario = await this.usuarioRepository.filtraUsuarioById(id)
 
-    // if(usuario.id != id) {
-    //   throw new Error("Usuário não localizado");
-    // }
+    if(!usuario){
+      throw new Error("Usuário não localizado");
+    }
 
     return new Promise<User>((resolve) => {
       resolve(usuario);
@@ -69,7 +71,9 @@ export class UserService {
     
     const usuario = await this.usuarioRepository.filtraUsuarioByEmail(email)
 
-    //Adicionar alguma validação
+    if(!usuario){
+      throw new Error("Usuário não localizado");
+    }
     
     return new Promise<User>((resolve) => {
       resolve(usuario);
@@ -83,7 +87,9 @@ export class UserService {
     
     const usuario = await this.usuarioRepository.filtraUsuarioByName(nome)
 
-    //Adicionar alguma validação
+    if(!usuario){
+      throw new Error("Usuário não localizado");
+    }
     
     return new Promise<User>((resolve) => {
       resolve(usuario);
