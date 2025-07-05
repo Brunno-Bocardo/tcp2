@@ -54,6 +54,14 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
   const estaDisponivel = (h: string) => !horariosOcupados.includes(h);
 
   async function handleAdicionarReserva() {
+    if (!usuarioLogado) {
+      alert("Erro: não foi possível identificar o usuário logado. Por favor, faça login novamente.");
+      return;
+    }
+    if (horarioFim <= horarioInicio) {
+      alert("O horário final da reserva deve ser posterior ao horário inicial.");
+      return;
+    }
     if (!salaSelecionada || !usuarioSelecionado || !dataReserva || !horarioInicio || !horarioFim) {
       alert("Por favor, preencha todos os campos para a reserva.");
       return;
@@ -65,6 +73,7 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
     }
 
     const novaReserva = {
+      solicitanteId: usuarioLogado.id,
       userId: usuarioSelecionado,
       salaId: salaSelecionada,
       dataSolicitacao: new Date().toISOString().split("T")[0],

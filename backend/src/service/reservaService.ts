@@ -11,10 +11,18 @@ export class ReservaService {
 
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
-        const { solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim } = reservaData;
-
+        const {
+            solicitante_id: solicitanteId,
+            user_id: userId,
+            sala_id: salaId,
+            data_da_solicitacao: dataSolicitacao,
+            data_da_reserva: dataReserva,
+            horario_inicio: horarioInicio,
+            horario_fim: horarioFim
+        } = reservaData;
         if (!solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
+            console.error("Dados da reserva incompletos:", reservaData);
+            throw new Error("Dados da reserva incompletos");
         }
 
         const user = await this.userRepository.filtraUsuarioById(userId);

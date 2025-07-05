@@ -73,10 +73,8 @@ export class ReservaRepository extends AbstractSubject {
 
       // Notificar observadores sobre a criação da reserva
       this.notify('criar_reserva', reserva, reserva.solicitanteId);
+      return reserva;
 
-      return new Promise<Reserva>((resolve) => {
-        resolve(reserva);
-      })
     } catch (err: any) {
       console.error("Erro ao cadastrar reserva:", err);
 

@@ -26,13 +26,11 @@ export class Reserva {
     const dataConvertida = parse(data, 'yyyy-MM-dd', new Date());
 
     if (!isValid(dataConvertida)) {
-      console.error(`Falha ao converter a data: ${data}. A data está no formato yyyy-MM-dd?`);
       throw new Error(`Data inválida: ${data}`);
     }
 
     return dataConvertida;
   }
-
   formatadorDeTempo(tempo: string) {
     const tempoConvertido = parse(tempo, "HH:mm", new Date());
 

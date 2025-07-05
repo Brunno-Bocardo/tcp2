@@ -4,6 +4,7 @@ import { getReservas, addReserva } from "../service/api";
 
 const mapApiDataToReserva = (apiData: any): Reserva => ({
     id: apiData.id,
+    solicitanteId: apiData.solicitante_id,
     userId: apiData.user_id,
     salaId: apiData.sala_id,
     dataSolicitacao: apiData.data_da_solicitacao,

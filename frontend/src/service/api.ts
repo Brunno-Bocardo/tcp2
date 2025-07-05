@@ -49,6 +49,7 @@ export async function getReservas(salaId: number | string, dataReserva: string):
 export async function addReserva(reserva: Reserva): Promise<any> {
     const reservaParaEnviar = {
         user_id: reserva.userId,
+        solicitante_id: reserva.solicitanteId,
         sala_id: reserva.salaId,
         data_da_solicitacao: reserva.dataSolicitacao,
         data_da_reserva: reserva.dataReserva,

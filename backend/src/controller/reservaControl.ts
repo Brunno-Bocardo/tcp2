@@ -9,7 +9,7 @@ const logRepository = LogRepository.getInstance();
 const reservaService = new ReservaService();
 const executor = new CommandExecuter();
 
-export async function reservarSala(req: Request, res: Response){
+export async function reservarSala(req: Request, res: Response) {
     const command = new ReservarSalaCommand(reservaService, req.body)
     const commandLog = new LogCommand(logRepository, req.body);
 
@@ -21,8 +21,12 @@ export async function reservarSala(req: Request, res: Response){
                 reserva: novaReserva
             }
         );
-    } catch (error:any) {
-        res.status(500).json({message: error.message})
+    } catch (error: any) {
+        console.error("!!!! ERRO CAPTURADO NO CONTROLLER !!!!");
+        console.error(error);
+        console.error("!!!! FIM DO ERRO !!!!");
+
+        res.status(500).json({ message: error.message })
     }
 }
 
@@ -35,8 +39,8 @@ export async function filtrarReservaPorId(req: Request, res: Response) {
                 reserva: reserva
             }
         )
-    } catch (error:any){
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -49,8 +53,8 @@ export async function atualizarReserva(req: Request, res: Response) {
                 resposta: resposta
             }
         )
-    } catch (error:any){
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -65,8 +69,8 @@ export async function cancelarReserva(req: Request, res: Response) {
                 resposta: resposta
             }
         )
-    } catch (error:any) {
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -76,6 +80,6 @@ export async function verificarReservas(req: Request, res: Response) {
         const reservas = await reservaService.verificarReservas(req.params)
         res.json(reservas);
     } catch (error: any) {
-        res.status(500).json({error: "Erro ao buscar reservas"})
-    } 
+        res.status(500).json({ error: "Erro ao buscar reservas" })
+    }
 }

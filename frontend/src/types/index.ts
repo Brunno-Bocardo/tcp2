@@ -15,6 +15,7 @@ export type User = {
 
 export type Reserva = {
     id?: number;
+    solicitanteId: number;
     userId: number;
     salaId: number;
     dataSolicitacao: string;
