@@ -1,4 +1,5 @@
 export class ReservaRequestDto {
+    solicitanteId: number;
     userId: number;
     salaId: number;
     dataDaSolicitacao: string;
@@ -6,7 +7,8 @@ export class ReservaRequestDto {
     horarioInicio: string;
     horarioFim: string;
 
-  constructor(userId?: number, salaId?: number, dataSolicitacao?: string, dia?: string, inicio?: string, fim?: string) {
+  constructor(solicitanteId?: number, userId?: number, salaId?: number, dataSolicitacao?: string, dia?: string, inicio?: string, fim?: string) {
+    this.solicitanteId = solicitanteId || 0;
     this.userId = userId || 0;
     this.salaId = salaId || 0;
     this.dataDaSolicitacao = dataSolicitacao || "";

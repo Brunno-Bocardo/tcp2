@@ -4,7 +4,7 @@ import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
 import { inicializarSistema } from "./database/inicializarDados";
-import { reservarSala, verificarReservas } from "./controller/reservaControl";
+import { atualizarReserva, cancelarReserva, filtrarReservaPorId, reservarSala, verificarReservas } from "./controller/reservaControl";
 import { atualizarUsuario, cadastrarUsuario, deletarUsuario, filtrarUsuario, filtrarUsuarios, verificarUsuario } from "./controller/userControl";
 import { atualizarSala, cadastrarSala, excluirSala, filtrarSala, filtrarSalas } from "./controller/salaControl";
 import { filtrarLogs } from "./controller/logControl";
@@ -47,10 +47,13 @@ app.use(cors({
 
 // ========================= ROTAS =========================
 
-// Alguns endpoins estão retornando objetos vazios (não existem no banco), o próximo passo seria validar o retorno do banco, tirando isso está funcionando. Os endpoints com ok foram testados.
+// Os endpoints com ok foram testados.
 
-// ENDPOINTS RESERVA
+// ENDPOINTS RESERVA - CRUD COMPLETO
 app.post("/api/reserva", reservarSala) //ok
+app.get("/api/reserva", filtrarReservaPorId) //ok
+app.put("/api/reserva", atualizarReserva) //ok
+app.delete("/api/reserva", cancelarReserva) //ok
 app.get("/api/reservas/:salaId/:data", verificarReservas) //ok
 
 // ENDPOINTS USUÁRIO - CRUD COMPLETO

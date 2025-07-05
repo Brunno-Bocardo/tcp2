@@ -29,6 +29,7 @@ export class ReservaRepository extends AbstractSubject {
     CREATE TABLE IF NOT EXISTS tcp2_db.Reservations
         (
             id INT AUTO_INCREMENT PRIMARY KEY,
+            solicitante_id INT NOT NULL,
             user_id INT NOT NULL,
             sala_id INT NOT NULL,
             data_da_solicitacao DATE NOT NULL,
@@ -36,6 +37,7 @@ export class ReservaRepository extends AbstractSubject {
             horario_de_inicio TIME NOT NULL,
             horario_de_fim TIME NOT NULL,
             FOREIGN KEY (user_id) REFERENCES Users(id),
+            FOREIGN KEY (solicitante_id) REFERENCES Users(id),
             FOREIGN KEY (sala_id) REFERENCES Rooms(id),
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
             updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -52,12 +54,13 @@ export class ReservaRepository extends AbstractSubject {
   async inserirReserva(reserva: Reserva): Promise<Reserva> {
     const query = `
       INSERT INTO tcp2_db.Reservations 
-      (user_id, sala_id, data_da_solicitacao, data_da_reserva, horario_de_inicio, horario_de_fim)
-      VALUES (?, ?, ?, ?, ?, ?)
+      (solicitante_id, user_id, sala_id, data_da_solicitacao, data_da_reserva, horario_de_inicio, horario_de_fim)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
     `;
 
     try {
       const resultado = await executarComandoSQL(query, [
+        reserva.solicitanteId,
         reserva.userId,
         reserva.salaId,
         reserva.dataDaSolicitacao,
@@ -69,7 +72,7 @@ export class ReservaRepository extends AbstractSubject {
       reserva.id = resultado.insertId;
 
       // Notificar observadores sobre a criação da reserva
-      this.notify('criar_reserva', reserva, reserva.userId);
+      this.notify('criar_reserva', reserva, reserva.solicitanteId);
 
       return new Promise<Reserva>((resolve) => {
         resolve(reserva);
@@ -84,6 +87,47 @@ export class ReservaRepository extends AbstractSubject {
       }, reserva.userId);
 
       throw err;
+    }
+  }
+
+  async filtrarReservaById(reservaId: number): Promise<Reserva> {
+    const query = "SELECT * FROM Reservations where id = ?";
+
+    try {
+      const resultado = await executarComandoSQL(query, [reservaId]);
+      return resultado[0]
+    } catch (err: any) {
+      console.log("Erro ao filtrar reserva: ", err);
+      throw err;
+    }
+
+  }
+
+  async atualizarReserva(reserva: Reserva): Promise<any> {
+    const query = "UPDATE Reservations set user_id = ?, sala_id = ?, data_da_solicitacao = ?, data_da_reserva = ?, horario_de_inicio = ?, horario_de_fim = ? where id = ?";
+
+    try {
+      const resultado = await executarComandoSQL(query, [reserva.userId, reserva.salaId, reserva.dataDaSolicitacao, reserva.dataDaReserva, reserva.horarioInicio, reserva.horarioFim, reserva.id])
+      console.log(`Reserva com ID ${reserva.id} atualizada com sucesso`);
+      return resultado;
+    } catch (erro: any) {
+      console.log(`Erro ao tentar atualizar reserva com ID ${reserva.id}`)
+      throw erro;
+    }
+  }
+
+  async deletarReserva(reserva: Reserva): Promise<any> {
+    const query = `DELETE FROM Reservations where id = ?`
+
+    try {
+      const resultado = await executarComandoSQL(query, [reserva.id]);
+      console.log(`Reserva com ID ${reserva.id} deletada com sucesso`);
+      return new Promise<any>((resolve) => {
+        resolve(resultado);
+      })
+    } catch (erro: any) {
+      console.log(`Erro ao deletar reserva com ID ${reserva.id}`);
+      throw erro;
     }
   }
 

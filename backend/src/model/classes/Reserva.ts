@@ -2,6 +2,7 @@ import { parse, isValid, format } from 'date-fns';
 
 export class Reserva {
   id: number;
+  solicitanteId: number;
   userId: number;
   salaId: number;
   dataDaSolicitacao: Date;
@@ -9,8 +10,9 @@ export class Reserva {
   horarioInicio: string;
   horarioFim: string;
 
-  constructor(userId: number, salaId: number, dataSolicitacao: string, dia: string, inicio: string, fim: string, id?: number) {
+  constructor(userId: number, salaId: number, dataSolicitacao: string, dia: string, inicio: string, fim: string, id?: number, solicitanteId?: number) {
     this.id = id || 0;
+    this.solicitanteId = solicitanteId || 0;
     this.userId = userId || 0;
     this.salaId = salaId || 0;
     this.dataDaSolicitacao = this.formatadorDeData(dataSolicitacao);

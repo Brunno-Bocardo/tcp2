@@ -97,7 +97,7 @@ export class SalaRepository extends AbstractSubject {
             const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo, sala.id])
             console.log(`Sala com ID ${sala.id} atualizada com sucesso`);
             return new Promise<Sala>((resolve) => {
-                resolve(resultado);
+                resolve(resultado[0]);
             })
         } catch (err: any) {
             console.log(`Erro ao tentar atualizar sala com ID ${sala.id}`)
@@ -105,14 +105,14 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async deletarSala(sala: Sala): Promise<Sala> {
+    async deletarSala(sala: Sala): Promise<any> {
         const query = "DELETE FROM Rooms where id = ?";
 
         try {
             const resultado = await executarComandoSQL(query, [sala.id]);
             console.log(`Sala com ID ${sala.id} deletada com sucesso`);
-            return new Promise<Sala>((resolve) => {
-                resolve(resultado);
+            return new Promise<any>((resolve) => {
+                resolve(resultado[0]);
             })
         } catch (err: any) {
             console.log(`Erro ao tentar deletar sala com ID ${sala.id}`);

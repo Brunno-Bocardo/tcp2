@@ -88,7 +88,7 @@ export class SalaService {
     }
           
 
-    async deletarSala(salaData:any): Promise<Sala> {
+    async deletarSala(salaData:any) {
         const {salaId, numero, capacidadeMaxima, tipo} = salaData;
 
         if (!salaId || !numero || !capacidadeMaxima || !tipo) {
