@@ -82,14 +82,14 @@ export class UserRepository extends AbstractSubject {
     }
   }
 
-  async filtraUsuarioById(id?: number): Promise<User> {
+  async filtraUsuarioById(id: number): Promise<User> {
     let query = "SELECT * FROM tcp2_db.Users where id = ?";
 
     try {
       const resultado = await executarComandoSQL(query, [id]);
       console.log("Busca efetuada com sucesso: ", resultado);
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       });
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
@@ -97,38 +97,101 @@ export class UserRepository extends AbstractSubject {
     }
   }
 
-  async filtraUsuarioByName(name?: number): Promise<User> {
+  async filtraUsuarioByEmail(email: string): Promise<User> {
+    let query = "SELECT * FROM tcp2_db.Users where email = ?";
+    
+    console.log("Email, ", email);
+
+    try {
+      const resultado = await executarComandoSQL(query, [email]);
+      
+      return new Promise<User>((resolve) => {
+        resolve(resultado[0]);
+      });
+    } catch (err: any) {
+      console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
+      throw err;
+    }
+  }
+
+  async filtraUsuarioByName(name?: string): Promise<User> {
     let query = "SELECT * FROM tcp2_db.Users where nome = ?";
 
     try {
       const resultado = await executarComandoSQL(query, [name]);
       console.log("Busca efetuada com sucesso: ", resultado);
       return new Promise<User>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       });
     } catch (err: any) {
       console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
       throw err;
     }
   }
-  
 
-  async filtraUsuarioByEmail(email?: string): Promise<User | undefined> {
-    let query = "SELECT * FROM tcp2_db.users where email = ?";
-    
-    console.log("Email, ", email);
+  async atualizarUsuario(user: User): Promise<User> {
+    const query = "UPDATE Users set nome = ?, email = ?, curso = ?, senha = ?, tipo = ? where id = ?"
 
     try {
-      const resultado = await executarComandoSQL(query, [email]);
-      console.log("Busca efetuada com sucesso: ", resultado);
-      
-      // Verifica se há resultados e retorna o primeiro
-      if (resultado) {
-        return resultado[0];
-      }
-    } catch (err: any) {
-      console.error(`Falha ao procurar usuario gerando o erro: ${err}`);
-      throw err;
+      const resultado = await executarComandoSQL(query, [user.nome, user.email, user.curso, user.senha, user.tipo, user.id])
+      console.log(`User atualizado com sucesso`, resultado);
+
+      // Notificar observadores sobre a atualização do usuário
+      this.notify('atualizar_usuario', {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        curso: user.curso,
+        tipo: user.tipo
+      });
+
+      return new Promise<User>((resolve) => {
+        resolve(resultado[0]);
+      })
+    } catch (erro: any){
+      console.log(`Erro ao tentar atualizar o usuário com ID ${user.id}`);
+
+      // Notificar observadores sobre o erro
+      this.notify('erro_atualizar_usuario', {
+        nome: user.nome,
+        email: user.email,
+        erro: erro.message
+      });
+
+      throw erro;
+    }
+  }
+
+  async deletarUsuario(user: User): Promise<User> {
+    const query = "DELETE FROM Users where id = ?"
+
+    try {
+      const resultado = await executarComandoSQL(query, [user.id])
+      console.log(`User com ID ${user.id} deletado com sucesso`);
+
+      // Notificar observadores sobre a deleção do usuário
+      this.notify('deletar_usuario', {
+        id: user.id,
+        nome: user.nome,
+        email: user.email,
+        curso: user.curso,
+        tipo: user.tipo
+      });
+
+      return new Promise<User>((resolve) => {
+        resolve(resultado[0]);
+      })
+    } catch (erro: any){
+      console.log(`Erro ao tentar deletar o usuário com ID ${user.id}`);
+
+      // Notificar observadores sobre o erro
+      this.notify('erro_deletar_usuario', {
+        nome: user.nome,
+        email: user.email,
+        erro: erro.message
+      });
+
+      throw erro;
     }
   }
 

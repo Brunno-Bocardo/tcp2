@@ -1,3 +1,5 @@
 export interface ICommand {
-    execute():Promise<void>
+    execute():Promise<any>
+    search():Promise<any>
+    undo():Promise<any>;
 }

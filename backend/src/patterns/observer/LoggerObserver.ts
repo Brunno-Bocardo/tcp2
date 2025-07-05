@@ -1,5 +1,6 @@
 import { IObserver } from "./IObserver";
-import { LogRepository, Log } from "../../repository/logRepository";
+import { LogRepository } from "../../repository/logRepository";
+import { ILog } from "../../model/interfaces/ILog";
 
 export class LoggerObserver implements IObserver {
     private static instance: LoggerObserver;
@@ -28,7 +29,7 @@ export class LoggerObserver implements IObserver {
             const dadosSerializados = JSON.stringify(dados);
             
             // Criar objeto de log
-            const log: Log = {
+            const log: ILog = {
                 evento,
                 descricao,
                 usuario_id: usuarioId,
@@ -49,6 +50,21 @@ export class LoggerObserver implements IObserver {
         switch (evento) {
         case 'criar_usuario':
             return `Usuário criado: ${dados.nome} (${dados.email})`;
+        
+        case 'erro_criar_usuario':
+            return `Erro ao tentar criar usuário: ${dados.nome}`
+
+        case 'atualizar_usuario':
+            return `Usuário atualizado: ${dados.nome} (${dados.email})`;
+        
+        case 'erro_atualizar_usuario':
+            return `Erro ao tentar atualizar usuário: ${dados.nome}`
+
+        case 'deletar_usuario':
+            return `Usuário deletado com sucesso: ${dados.nome}`
+        
+        case 'erro_deletar_usuario':
+            return `Erro ao tentar deletar usuário: ${dados.nome}`
         
         case 'login_usuario':
             return `Login realizado: ${dados.email}`;
