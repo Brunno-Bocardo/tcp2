@@ -1,3 +1,5 @@
+// Reservas.tsx
+
 'use client';
 import React, { useState } from "react";
 import { useUsers } from "../hooks/useUsers";
@@ -5,7 +7,7 @@ import { useSalas } from "../hooks/useSalas";
 import { useReserva } from "../hooks/useReserva";
 import DashboardCoordenador from "../components/DashboardCoordenador";
 import HorarioDropdown from "../components/HorarioDropdown";
-import { Reserva } from "../types";
+
 interface ReservasProps {
   nomeUsuario?: string; // RECEBE O NOME OU EMAIL DO USUARIO LOGADO
 }
@@ -20,16 +22,17 @@ const horariosDisponiveis = [
 const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
   // USAMOS OS HOOKS PRA PEGAR OS DADOS DE USERS, SALAS E RESERVAS
   const { users, usuarioLogado, tipoUsuario } = useUsers(nomeUsuario);
-  const { salas, criarSala } = useSalas();
-  const { reservas, criarReserva } = useReserva();
+  const { salas, loading: loadingSalas, error: errorSalas, criarSala } = useSalas();
 
   // ESTADOS LOCAIS PRA CONTROLAR QUAL ABA TA ATIVA E DADOS DO FORMULARIO
   const [aba, setAba] = useState<"reservas" | "dashboard">("reservas");
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<number | null>(null);
   const [salaSelecionada, setSalaSelecionada] = useState<number | null>(null);
-  const [dataDaReserva, setDataReserva] = useState("");
+  const [dataReserva, setDataReserva] = useState("");
   const [horarioInicio, setHorarioInicio] = useState("");
   const [horarioFim, setHorarioFim] = useState("");
+
+  const { reservas, criarReserva, error: errorReservas } = useReserva(salaSelecionada ?? undefined, dataReserva);
 
   React.useEffect(() => {
     if (tipoUsuario !== "Coordenador" && usuarioLogado) {
@@ -38,51 +41,55 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
   }, [tipoUsuario, usuarioLogado]);
 
   // CALCULA QUAIS HORARIOS JA ESTAO OCUPADOS NA SALA E DATA SELECIONADAS
-  const horariosOcupados = reservas
-    .filter(r => r.salaId === salaSelecionada && r.dataDaReserva === dataDaReserva)
-    .flatMap(r => {
+  const horariosOcupados = React.useMemo(() => {
+    return reservas.flatMap(r => {
       const inicio = horariosDisponiveis.indexOf(r.horarioInicio);
       const fim = horariosDisponiveis.indexOf(r.horarioFim);
-      return horariosDisponiveis.slice(inicio, fim); // PEGA O INTERVALO DE HORARIOS OCUPADOS
+      if (inicio === -1 || fim === -1) return []; // Ignora se o horário não for encontrado
+      return horariosDisponiveis.slice(inicio, fim);
     });
+  }, [reservas]);
 
   // CHECA SE UM HORARIO ESTA DISPONIVEL (NAO ESTA NA LISTA DE OCUPADOS) 
   const estaDisponivel = (h: string) => !horariosOcupados.includes(h);
 
-  // FUNCAO PRA TRATAR O ENVIO DO FORMULARIO E CRIAR UMA NOVA RESERVA
-  function handleAdicionarReserva() {
-    // VALIDA SE TODOS OS CAMPOS ESTAO PREENCHIDOS
-    if (!salaSelecionada || !usuarioSelecionado || !dataDaReserva || !horarioInicio || !horarioFim) {
-      alert("Preencha todos os campos");
+  async function handleAdicionarReserva() {
+    if (!salaSelecionada || !usuarioSelecionado || !dataReserva || !horarioInicio || !horarioFim) {
+      alert("Por favor, preencha todos os campos para a reserva.");
       return;
     }
 
-    // VALIDA SE HORARIO FINAL EH MAIOR QUE O INICIAL
     if (horarioFim <= horarioInicio) {
-      alert("Horario final deve ser maior que o inicial");
+      alert("O horário final da reserva deve ser posterior ao horário inicial.");
       return;
     }
 
-    // MONTA O OBJETO NOVA RESERVA COM OS DADOS DO FORM
-    const novaReserva: Reserva = {
+    const novaReserva = {
       userId: usuarioSelecionado,
       salaId: salaSelecionada,
-      dataDaSolicitacao: new Date().toISOString().split("T")[0], // DATA DE HOJE
-      dataDaReserva,
+      dataSolicitacao: new Date().toISOString().split("T")[0],
+      dataReserva,
       horarioInicio,
       horarioFim,
     };
 
-    // CHAMA O HOOK PRA CRIAR A RESERVA
-    criarReserva(novaReserva);
+    const sucesso = await criarReserva(novaReserva as any);
 
-    // LIMPA OS CAMPOS DO FORMULARIO APOS CRIAR A RESERVA
-    setSalaSelecionada(null);
-    setUsuarioSelecionado(null);
-    setDataReserva("");
-    setHorarioInicio("");
-    setHorarioFim("");
+    if (sucesso) {
+      alert("Reserva criada com sucesso!");
+      setSalaSelecionada(null);
+      setDataReserva("");
+      setHorarioInicio("");
+      setHorarioFim("");
+      if (tipoUsuario === "Coordenador") {
+        setUsuarioSelecionado(null);
+      }
+    } else {
+      alert("Não foi possível criar a reserva. Verifique a mensagem de erro ou tente novamente.");
+    }
   }
+
+  const formError = errorSalas || errorReservas;
 
   return (
     <div>
@@ -94,7 +101,6 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
         >
           Reservas
         </button>
-        {/* SO MOSTRA ABA DASHBOARD SE USUARIO FOR COORDENADOR */}
         {tipoUsuario === "Coordenador" && (
           <button
             className={`px-4 py-2 rounded ${aba === "dashboard" ? "bg-[#80cbc4] text-[#1e1e2f]" : "bg-[#2a2a40] text-[#e0e0e0]"}`}
@@ -120,14 +126,13 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
         <main className="min-h-screen bg-[#1e1e2f] text-[#e0e0e0] p-8 font-sans max-w-7xl mx-auto flex flex-col gap-8">
           <header className="flex flex-col items-center gap-2">
             <h1 className="text-5xl font-extrabold tracking-wide">SISTEMA DE RESERVAS</h1>
-            {/* MOSTRA NOME DO USUARIO LOGADO OU MENSAGEM DE CARREGANDO */}
             {usuarioLogado ? (
               <p className="text-lg text-[#80cbc4] tracking-wide select-none">
                 Bem-vindo, <span className="font-semibold">{usuarioLogado.nome}</span>!
               </p>
             ) : (
               <p className="text-lg text-[#80cbc4] tracking-wide select-none">
-                Carregando usuario...
+                Carregando usuário...
               </p>
             )}
           </header>
@@ -135,6 +140,14 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
           {/* FORMULARIO DE NOVA RESERVA */}
           <section className="bg-[#2a2a40] rounded-xl p-8 shadow-lg max-w-4xl mx-auto">
             <h2 className="text-2xl font-semibold mb-6 border-b border-[#80cbc4] pb-2">Nova Reserva</h2>
+
+            {formError && (
+              <div className="bg-red-900 border border-red-700 text-white px-4 py-3 rounded-md relative mb-6" role="alert">
+                <strong className="font-bold">Ocorreu um erro: </strong>
+                <span className="block sm:inline">{formError}</span>
+              </div>
+            )}
+
             <form
               onSubmit={e => {
                 e.preventDefault();
@@ -144,8 +157,7 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
             >
               {/* SELECAO DE USUARIO */}
               <div>
-                <label className="block mb-2 text-sm font-semibold">Usuario</label>
-                {/* SE FOR COORDENADOR PODE ESCOLHER USUARIO, SENAO MOSTRA APENAS O NOME */}
+                <label className="block mb-2 text-sm font-semibold">Usuário</label>
                 {tipoUsuario === "Coordenador" ? (
                   <select
                     value={usuarioSelecionado || ""}
@@ -153,13 +165,9 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
                     className="w-full p-3 rounded-md bg-[#44475a] border border-gray-600 text-[#e0e0e0] focus:outline-none focus:border-[#80cbc4] transition"
                     required
                   >
-                    <option value="" disabled>
-                      Selecione um usuario
-                    </option>
+                    <option value="" disabled>Selecione um usuário</option>
                     {users.map(u => (
-                      <option key={u.id} value={u.id}>
-                        {u.nome} ({u.tipo})
-                      </option>
+                      <option key={u.id} value={u.id}>{u.nome} ({u.tipo})</option>
                     ))}
                   </select>
                 ) : (
@@ -167,7 +175,7 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
                     type="text"
                     value={usuarioLogado?.nome || ""}
                     disabled
-                    className="bg-gray-700 text-white-300 justify-center w-full p-3 rounded-md border border-gray-600 focus:outline-none focus:border-[#80cbc4] transition"
+                    className="w-full p-3 rounded-md bg-gray-700 border border-gray-600 cursor-not-allowed"
                   />
                 )}
               </div>
@@ -180,10 +188,10 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
                   onChange={e => setSalaSelecionada(Number(e.target.value))}
                   className="w-full p-3 rounded-md bg-[#44475a] border border-gray-600 text-[#e0e0e0] focus:outline-none focus:border-[#80cbc4] transition"
                   required
-                  disabled={salas.length === 0}
+                  disabled={loadingSalas || salas.length === 0}
                 >
                   <option value="" disabled>
-                    {salas.length === 0 ? "Nenhuma sala disponivel" : "Selecione uma sala"}
+                    {loadingSalas ? "Carregando salas..." : salas.length === 0 ? "Nenhuma sala disponível" : "Selecione uma sala"}
                   </option>
                   {salas.map(s => (
                     <option key={s.id} value={s.id}>
@@ -198,9 +206,9 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
                 <label className="block mb-2 text-sm font-semibold">Data da Reserva</label>
                 <input
                   type="date"
-                  value={dataDaReserva}
+                  value={dataReserva}
                   onChange={e => setDataReserva(e.target.value)}
-                  min={new Date().toISOString().split("T")[0]} // NAO PERMITE DATA PASSADA
+                  min={new Date().toISOString().split("T")[0]}
                   className="w-full p-3 rounded-md bg-[#44475a] border border-gray-600 text-[#e0e0e0] focus:outline-none focus:border-[#80cbc4] transition"
                   required
                 />
@@ -209,15 +217,15 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
               {/* SELECAO DE HORARIO INICIO E FIM */}
               <div className="flex gap-4">
                 <HorarioDropdown
-                  label="Horario Inicio"
+                  label="Horário Início"
                   horarios={horariosDisponiveis}
                   horarioSelecionado={horarioInicio}
                   setHorarioSelecionado={setHorarioInicio}
                   horarioDisponivel={estaDisponivel}
-                  disabled={!salaSelecionada || !dataDaReserva}
+                  disabled={!salaSelecionada || !dataReserva}
                 />
                 <HorarioDropdown
-                  label="Horario Fim"
+                  label="Horário Fim"
                   horarios={horariosDisponiveis}
                   horarioSelecionado={horarioFim}
                   setHorarioSelecionado={setHorarioFim}
@@ -231,9 +239,7 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
               <div className="sm:col-span-2 flex justify-center">
                 <button
                   type="submit"
-                  disabled={
-                    !salaSelecionada || !usuarioSelecionado || !dataDaReserva || !horarioInicio || !horarioFim
-                  }
+                  disabled={!salaSelecionada || !usuarioSelecionado || !dataReserva || !horarioInicio || !horarioFim}
                   className="bg-[#80cbc4] hover:bg-[#80cbd9] text-[#1e1e2f] font-bold py-3 px-12 rounded-xl shadow-md transition disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Adicionar Reserva
@@ -245,6 +251,6 @@ const Reservas: React.FC<ReservasProps> = ({ nomeUsuario }) => {
       )}
     </div>
   );
-};
+}
 
 export default Reservas;

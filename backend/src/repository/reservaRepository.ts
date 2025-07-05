@@ -10,7 +10,7 @@ export class ReservaRepository extends AbstractSubject {
   private constructor() {
     super();
     this.createTable();
-    
+
     // Adicionar o LoggerObserver como observador
     const logger = LoggerObserver.getInstance();
     this.attach(logger);
@@ -57,33 +57,33 @@ export class ReservaRepository extends AbstractSubject {
     `;
 
     try {
-        const resultado = await executarComandoSQL(query, [
-            reserva.userId,
-            reserva.salaId,
-            reserva.dataDaSolicitacao,
-            reserva.dataDaReserva,
-            reserva.horarioInicio,
-            reserva.horarioFim
-        ]);
-        console.log("Reserva inserida com sucesso");
-        reserva.id = resultado.insertId;
-        
-        // Notificar observadores sobre a criação da reserva
-        this.notify('criar_reserva', reserva, reserva.userId);
-        
-        return new Promise<Reserva>((resolve) => {
-            resolve(reserva);
-        })
+      const resultado = await executarComandoSQL(query, [
+        reserva.userId,
+        reserva.salaId,
+        reserva.dataDaSolicitacao,
+        reserva.dataDaReserva,
+        reserva.horarioInicio,
+        reserva.horarioFim
+      ]);
+      console.log("Reserva inserida com sucesso");
+      reserva.id = resultado.insertId;
+
+      // Notificar observadores sobre a criação da reserva
+      this.notify('criar_reserva', reserva, reserva.userId);
+
+      return new Promise<Reserva>((resolve) => {
+        resolve(reserva);
+      })
     } catch (err: any) {
-        console.error("Erro ao cadastrar reserva:", err);
-        
-        // Notificar observadores sobre o erro
-        this.notify('erro_criar_reserva', {
-            ...reserva,
-            erro: err.message
-        }, reserva.userId);
-        
-        throw err;
+      console.error("Erro ao cadastrar reserva:", err);
+
+      // Notificar observadores sobre o erro
+      this.notify('erro_criar_reserva', {
+        ...reserva,
+        erro: err.message
+      }, reserva.userId);
+
+      throw err;
     }
   }
 

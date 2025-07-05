@@ -17,8 +17,8 @@ export type Reserva = {
     id?: number;
     userId: number;
     salaId: number;
-    dataDaSolicitacao: string;
-    dataDaReserva: string;
+    dataSolicitacao: string;
+    dataReserva: string;
     horarioInicio: string;
     horarioFim: string;
 };
@@ -27,3 +27,12 @@ export type Resposta = {
     status: string;
     xml_enviado: string;
 };
+
+export interface ReservaBackend {
+    usuario_id: number;
+    sala_id: number;
+    data: string;
+    hora_inicio: string;
+    hora_fim: string;
+    descricao?: string;
+}

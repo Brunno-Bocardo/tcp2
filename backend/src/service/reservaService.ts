@@ -8,38 +8,47 @@ export class ReservaService {
     private reservaRepository = ReservaRepository.getInstance();
     private userRepository = UserRepository.getInstance();
     private salaRepository = SalaRepository.getInstance();
-    
+
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
-        const {userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
-
-        if(!userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
+        console.log("registrarReserva chamado com dados:", reservaData);
+        const {
+            user_id: userId,
+            sala_id: salaId,
+            data_da_solicitacao: dataSolicitacao,
+            data_da_reserva: dataReserva,
+            horario_inicio: horarioInicio,
+            horario_fim: horarioFim
+        } = reservaData;
+        if (!userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
+            console.error("Dados da reserva incompletos:", reservaData);
+            throw new Error("Dados da reserva incompletos");
         }
 
         const user = await this.userRepository.filtraUsuarioById(userId);
-        const sala = await this.salaRepository.filtrarSalaById(salaId)
+        const sala = await this.salaRepository.filtrarSalaById(salaId);
 
-        if(!user){
+        if (!user) {
+            console.error(`Usuário com ID ${userId} não encontrado.`);
             throw new Error(`Usuário com ID ${userId} não encontrado.`);
         }
-        if(!sala){
+        if (!sala) {
+            console.error(`Sala com ID ${salaId} não encontrada.`);
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
         const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim);
 
         const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
-        console.log('Reserva registrada: ', reservaRegistrada); 
-        return new Promise<Reserva>((resolve) => {
-            resolve(reservaRegistrada);
-        });
+        console.log('Reserva registrada:', reservaRegistrada);
+
+        return reservaRegistrada;
     }
 
     async verificarReservas(reservaData: any): Promise<Reserva[]> {
-        const {salaId, data} = reservaData;
+        const { salaId, data } = reservaData;
 
-        if(!salaId || !data) {
+        if (!salaId || !data) {
             throw new Error("Dados da reserva incompletos");
         }
 

@@ -1,13 +1,13 @@
-import { parse, isValid, format} from 'date-fns';
+import { parse, isValid, format } from 'date-fns';
 
 export class Reserva {
-    id: number;
-    userId: number;
-    salaId: number;
-    dataDaSolicitacao: Date;
-    dataDaReserva: Date;
-    horarioInicio: string;
-    horarioFim: string;
+  id: number;
+  userId: number;
+  salaId: number;
+  dataDaSolicitacao: Date;
+  dataDaReserva: Date;
+  horarioInicio: string;
+  horarioFim: string;
 
   constructor(userId: number, salaId: number, dataSolicitacao: string, dia: string, inicio: string, fim: string, id?: number) {
     this.id = id || 0;
@@ -18,19 +18,20 @@ export class Reserva {
     this.horarioInicio = this.formatadorDeTempo(inicio);
     this.horarioFim = this.formatadorDeTempo(fim);
   }
-  
 
-  formatadorDeData(data:string): Date {
-    const dataConvertida = parse(data, 'dd/MM/yyyy', new Date());
+
+  formatadorDeData(data: string): Date {
+    const dataConvertida = parse(data, 'yyyy-MM-dd', new Date());
 
     if (!isValid(dataConvertida)) {
+      console.error(`Falha ao converter a data: ${data}. A data está no formato yyyy-MM-dd?`);
       throw new Error(`Data inválida: ${data}`);
     }
 
     return dataConvertida;
   }
 
-  formatadorDeTempo(tempo:string){
+  formatadorDeTempo(tempo: string) {
     const tempoConvertido = parse(tempo, "HH:mm", new Date());
 
     if (!isValid(tempoConvertido)) {

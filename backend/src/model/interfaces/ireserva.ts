@@ -1,7 +1,7 @@
 import { Sala } from "./ISala";
 import { User } from "./IUser";
 
-export interface IReserva {
+export interface ireserva {
   sala: Sala;
   usuario: User;
   dataSolicitacao: string;

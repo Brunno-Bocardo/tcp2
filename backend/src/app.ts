@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { IReserva } from "./model/interfaces/IReserva";
 import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
@@ -40,10 +39,10 @@ inicializarSistema();
 
 // CONFIGURA CORS PRA PERMITIR O FRONT
 app.use(cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+})
 );
 
 // ========================= ROTAS =========================
