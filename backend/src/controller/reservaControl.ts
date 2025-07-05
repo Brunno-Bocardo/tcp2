@@ -22,10 +22,7 @@ export async function reservarSala(req: Request, res: Response) {
             }
         );
     } catch (error: any) {
-        console.error("!!!! ERRO CAPTURADO NO CONTROLLER !!!!");
         console.error(error);
-        console.error("!!!! FIM DO ERRO !!!!");
-
         res.status(500).json({ message: error.message })
     }
 }
