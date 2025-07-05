@@ -22,7 +22,7 @@ export async function cadastrarUsuario(req: Request, res: Response){
 };
 
 export async function filtrarUsuario(req: Request, res: Response) {
-    const command = new UserFiltrarCommand(usuarioService, req.query.id as string, req.query.email as string, req.query.nome as string)
+    const command = new UserFiltrarCommand(usuarioService, undefined, req.query.id as string, req.query.email as string, req.query.nome as string)
 
     try {
         const usuario = await executor.run(command);

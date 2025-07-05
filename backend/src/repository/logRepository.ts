@@ -109,4 +109,16 @@ export class LogRepository {
       throw err;
     }
   }
+
+  async removerLog(reservaId: number): Promise<any> {
+    const query = `DELETE FROM Logs WHERE evento = "criar_reserva" AND dados LIKE '%"id":${reservaId}%'`
+
+    try {
+      const resultado = await executarComandoSQL(query, []);
+      console.log(`Log removido com sucesso`);
+    } catch (erro:any) {
+      console.log(`Erro ao tentar remover log de evento criar_reserva`)
+      throw erro;
+    }
+  }
 }

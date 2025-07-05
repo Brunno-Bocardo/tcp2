@@ -1,18 +1,11 @@
 import { Request, Response } from "express";
 import { SalaService } from "../service/salaService";
-import { CommandExecuter } from "../patterns/commands/CommandExecuter";
-import { SalaCadastrarCommand } from "../patterns/commands/SalaCadastrarCommand";
-import { SalaAtualizarCommand } from "../patterns/commands/SalaAtualizarCommand";
-import { SalaExcluirCommand } from "../patterns/commands/SalaExcluirCommand";
 
 const salaService = new SalaService();
-const executor = new CommandExecuter();
 
 export async function cadastrarSala(req: Request, res: Response) {
-    const command = new SalaCadastrarCommand(salaService, req.body)
-
     try {
-        const novaSala = await executor.run(command);
+        const novaSala = await salaService.cadastrarSala(req.body)
         res.status(201).json(
             {
                 mensagem: "Sala adicionada com sucesso!",
@@ -40,10 +33,8 @@ export async function filtrarSala(req: Request, res: Response) {
 }
 
 export async function atualizarSala(req: Request, res: Response) {
-    const command = new SalaAtualizarCommand(salaService, req.body)
-
     try {
-        const sala = await executor.run(command);
+        const sala = await salaService.atualizarSala(req.body)
         res.status(200).json(
             {
                 mensagem: "Sala atualizada com sucesso!",
@@ -56,10 +47,9 @@ export async function atualizarSala(req: Request, res: Response) {
 }
 
 export async function excluirSala(req: Request, res: Response) {
-    const command = new SalaExcluirCommand(salaService, req.body)
 
     try {
-        const resposta = await executor.run(command);
+        const resposta = await salaService.deletarSala(req.body);
         res.status(200).json(
             {
                 mensagem: "Sala excluida com sucesso!",
