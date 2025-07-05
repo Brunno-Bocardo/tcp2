@@ -67,6 +67,27 @@ export class ReservaService {
         })
     }
 
+    async filtrarReservasPorIdUser(solicitanteId: string): Promise<Reserva[]> {
+
+
+        if (!solicitanteId) {
+            throw new Error(`ID ${solicitanteId} inválido`);
+        }
+
+        const id = typeof solicitanteId === 'string' ? parseInt(solicitanteId) : solicitanteId;
+
+        const reservas = await this.reservaRepository.filtrarReservasByIdUser(id);
+
+        if (!reservas) {
+            throw new Error("Reservas não localizadas");
+        }
+
+        console.log("Reservas encontradas com sucesso!");
+        return new Promise<Reserva[]>((resolve) => {
+            resolve(reservas);
+        })
+    }
+
     async atualizarReserva(reservaData: any) {
         const { id, solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim } = reservaData;
 

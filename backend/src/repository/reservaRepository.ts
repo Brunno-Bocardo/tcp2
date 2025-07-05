@@ -101,6 +101,18 @@ export class ReservaRepository extends AbstractSubject {
 
   }
 
+  async filtrarReservasByIdUser(solicitanteId: any): Promise<Reserva[]> {
+    const query = `SELECT * FROM Reservations where solicitante_id = ${solicitanteId}`;
+
+    try {
+      const resultado = await executarComandoSQL(query, []);
+      return resultado
+    } catch (err: any) {
+      console.log("Erro ao filtrar reserva: ", err);
+      throw err;
+    }
+  }
+
   async atualizarReserva(reserva: Reserva): Promise<any> {
     const query = "UPDATE Reservations set user_id = ?, sala_id = ?, data_da_solicitacao = ?, data_da_reserva = ?, horario_de_inicio = ?, horario_de_fim = ? where id = ?";
 

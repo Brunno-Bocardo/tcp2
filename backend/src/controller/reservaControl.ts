@@ -41,6 +41,20 @@ export async function filtrarReservaPorId(req: Request, res: Response) {
     }
 }
 
+export async function filtrarReservasPorIdUser(req: Request, res: Response) {
+    try {
+        const reservas = await reservaService.filtrarReservasPorIdUser(req.query.solicitanteId as string);
+        res.status(200).json(
+            {
+                mensagem: "Reservas filtradas com sucesso!",
+                reserva: reservas
+            }
+        )
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
+    }
+}
+
 export async function atualizarReserva(req: Request, res: Response) {
     try {
         const resposta = await reservaService.atualizarReserva(req.body);
