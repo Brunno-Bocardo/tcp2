@@ -11,17 +11,10 @@ export class ReservaService {
 
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
-        const {
-            solicitante_id: solicitanteId,
-            user_id: userId,
-            sala_id: salaId,
-            data_da_solicitacao: dataSolicitacao,
-            data_da_reserva: dataReserva,
-            horario_inicio: horarioInicio,
-            horario_fim: horarioFim
+        const { solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim
         } = reservaData;
+
         if (!solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            console.error("Dados da reserva incompletos:", reservaData);
             throw new Error("Dados da reserva incompletos");
         }
 
@@ -38,6 +31,7 @@ export class ReservaService {
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
+        console.log(`Datas: ${dataSolicitacao} ${dataReserva} `)
         const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim, undefined, solicitanteId);
 
         const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
@@ -104,7 +98,7 @@ export class ReservaService {
         const usuarioExiste = await this.userRepository.filtraUsuarioById(userId)
 
         if (!usuarioExiste) {
-            throw new Error(`Usuario com ID ${id} não encontrado`)
+            throw new Error(`Usuario com ID ${userId} não encontrado`)
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(parseInt(salaId))
@@ -123,10 +117,16 @@ export class ReservaService {
     }
 
     async deletarReserva(reservaData: any) {
-        const { id, solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim } = reservaData;
+        const { id, solicitanteId } = reservaData;
 
-        if (!id || !solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
+        if (!id || !solicitanteId) {
             throw new Error("Dados da reserva incompletos")
+        }
+
+        const usuarioExiste = await this.userRepository.filtraUsuarioById(solicitanteId)
+
+        if (!usuarioExiste) {
+            throw new Error(`Usuario com ID ${solicitanteId} não encontrado`)
         }
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
@@ -135,9 +135,7 @@ export class ReservaService {
             throw new Error(`Reserva com ID ${id} não encontrada`)
         }
 
-        const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim, id, solicitanteId);
-
-        const resposta = await this.reservaRepository.deletarReserva(reserva);
+        const resposta = await this.reservaRepository.deletarReserva(parseInt(id));
 
         if (resposta.affectedRows === 0) {
             throw new Error("Reserva não encontrada ou já deletada.");

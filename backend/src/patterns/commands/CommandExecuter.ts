@@ -38,11 +38,11 @@ export class CommandExecuter {
     async desfazer(command: ICommand): Promise<any> {
         const resposta = await command.search();
         
-        console.log(`Resultando do search: ID: ${resposta.id}, ${resposta.user_id} e ${resposta.sala_id}`)
+        console.log(`Resultando do search: ID: ${resposta.id}, ${resposta.solicitante_id} e ${resposta.sala_id}`)
 
         console.log("Histórico no momento do desfazer:", Array.from(this.historico.keys()));
 
-        if(resposta.id && resposta.user_id && resposta.sala_id) {
+        if(resposta.id && resposta.solicitante_id && resposta.sala_id) {
             const chave = this.gerarChave(resposta);
             console.log(`Chave: ${chave}`)
             const oldCommand = this.historico.get(chave);

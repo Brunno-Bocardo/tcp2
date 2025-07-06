@@ -126,17 +126,17 @@ export class ReservaRepository extends AbstractSubject {
     }
   }
 
-  async deletarReserva(reserva: Reserva): Promise<any> {
+  async deletarReserva(id: number): Promise<any> {
     const query = `DELETE FROM Reservations where id = ?`
 
     try {
-      const resultado = await executarComandoSQL(query, [reserva.id]);
-      console.log(`Reserva com ID ${reserva.id} deletada com sucesso`);
+      const resultado = await executarComandoSQL(query, [id]);
+      console.log(`Reserva com ID ${id} deletada com sucesso`);
       return new Promise<any>((resolve) => {
         resolve(resultado);
       })
     } catch (erro: any) {
-      console.log(`Erro ao deletar reserva com ID ${reserva.id}`);
+      console.log(`Erro ao deletar reserva com ID ${id}`);
       throw erro;
     }
   }

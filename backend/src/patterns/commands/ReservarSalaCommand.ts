@@ -12,6 +12,7 @@ export class ReservarSalaCommand implements ICommand {
         const reserva =  await this.reservaService.registrarReserva(this.dadosReserva)
 
         this.dadosReserva.id = reserva.id
+        this.dadosReserva.solicitanteId = reserva.solicitanteId
         this.dadosReserva.userId = reserva.userId
         this.dadosReserva.salaId = reserva.salaId
 
