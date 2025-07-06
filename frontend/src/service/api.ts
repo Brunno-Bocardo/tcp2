@@ -65,3 +65,50 @@ export async function addReserva(reserva: Reserva): Promise<any> {
 
     return res.json();
 }
+
+export async function listarReservasDoUsuarioAPI(userId: number): Promise<Reserva[]> {
+    const res = await fetch(`${API}/reservas?solicitanteId=${userId}`);
+
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({}));
+        throw new Error(errorData.message || "Erro ao buscar as reservas do usuário");
+    }
+
+    const dataFromApi = await res.json();
+    const rawReservas = dataFromApi.reserva;
+    if (!Array.isArray(rawReservas)) {
+        console.error("A resposta ficou raw:", rawReservas);
+        return [];
+    }
+
+    const reservasEmCamelCase: Reserva[] = rawReservas.map((reserva: any) => ({
+        id: reserva.id,
+        solicitanteId: reserva.solicitante_id,
+        userId: reserva.user_id,
+        salaId: reserva.sala_id,
+        dataSolicitacao: reserva.data_da_solicitacao.split('T')[0],
+        dataReserva: reserva.data_da_reserva.split('T')[0],
+        horarioInicio: reserva.horario_de_inicio,
+        horarioFim: reserva.horario_de_fim,
+    }));
+
+    return reservasEmCamelCase;
+}
+
+export async function cancelarReservaAPI(reservaId: number, solicitanteId: number): Promise<any> {
+    const res = await fetch(`${API}/reserva`, {
+        method: 'DELETE',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ reservaId, solicitanteId }),
+    });
+
+    if (!res.ok) {
+        const errorData = await res.json().catch(() => ({
+            message: res.statusText
+        }));
+        throw new Error(errorData.message || 'Erro ao cancelar a reserva');
+    }
+    return res.json();
+}
