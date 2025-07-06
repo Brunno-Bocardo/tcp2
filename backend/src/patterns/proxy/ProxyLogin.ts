@@ -7,15 +7,14 @@ import { SenhaValidator } from "../chainOfResponsibility/SenhaValidator";
 
 export class ProxyLogin implements ILogin {
     private userService = new UserService(); // Instancia o serviço diretamente
+    private emailValidator = new EmailValidator();
+    private senhaValidator = new SenhaValidator();
 
     public async login(userData: LoginRequestDto): Promise<User> {
 
-        const emailValidator = new EmailValidator();
-        const senhaValidator = new SenhaValidator();
-
         // Validação básica com CoR antes de delegar ao objeto real
-        emailValidator.setNext(senhaValidator);
-        emailValidator.validate(userData);
+        this.emailValidator.setNext(this.senhaValidator);
+        this.emailValidator.validate(userData);
         
         console.log(`Tentativa de login para o usuário: ${userData.email}`);
 

@@ -1,5 +1,5 @@
-import { Sala } from "../../model/interfaces/ISala";
+import { ISala } from "../../model/interfaces/ISala";
 
 export abstract class CriadorSala {
-  public abstract criarSala(salaId: number, numeroSala: number, capacidadeMaxima: number): Sala; //factory method
+  public abstract criarSala(salaId: number, numeroSala: number, capacidadeMaxima: number): ISala; //factory method
 }

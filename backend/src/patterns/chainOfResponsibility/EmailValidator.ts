@@ -5,7 +5,7 @@ export class EmailValidator extends AbstractValidator {
         if(!request.email || !request.email.includes("@")) {
             throw new Error("Email inválido");
         }
-
+        
         super.validate(request);
     }
 }

@@ -1,6 +1,5 @@
 import express, { Request, Response } from "express";
 import cors from "cors";
-import { IReserva } from "./model/interfaces/IReserva";
 import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
@@ -62,7 +61,7 @@ app.post("/api/user", cadastrarUsuario) //ok
 app.get("/api/user", filtrarUsuario) //ok
 app.put("/api/user", atualizarUsuario) //ok
 app.delete("/api/user", deletarUsuario) //ok
-app.post("/api/login", verificarUsuario) //ok
+app.post("/api/usuarios/verificar", verificarUsuario) //ok
 app.get("/api/usuarios", filtrarUsuarios) //ok
 
 // ENDPOINTS SALA - CRUD COMPLETO

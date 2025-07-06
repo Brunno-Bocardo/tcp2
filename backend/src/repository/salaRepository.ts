@@ -1,5 +1,5 @@
 import { executarComandoSQL } from "../database/mysql";
-import { Sala } from "../model/interfaces/ISala";
+import { ISala } from "../model/interfaces/ISala";
 import { AbstractSubject } from "../patterns/observer/AbstractSubject";
 import { LoggerObserver } from "../patterns/observer/LoggerObserver";
 
@@ -40,7 +40,7 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async cadastrarSala(sala: Sala): Promise<Sala> {
+    async cadastrarSala(sala: ISala): Promise<ISala> {
         const query = "INSERT INTO tcp2_db.Rooms (numero, capacidade_maxima, tipo) VALUES (?,?,?)";
 
         try{
@@ -56,7 +56,7 @@ export class SalaRepository extends AbstractSubject {
                 tipo: sala.tipo
             });
 
-            return new Promise<Sala>((resolve) => {
+            return new Promise<ISala>((resolve) => {
                 resolve(sala);
             })
         } catch (err: any) {
@@ -73,7 +73,7 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async filtrarSalaById(salaId: number): Promise<Sala> {
+    async filtrarSalaById(salaId: number): Promise<ISala> {
     
         const query = "SELECT * FROM Rooms where id = ?";
 
@@ -87,13 +87,13 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async atualizarSala(sala: Sala): Promise<Sala> {
+    async atualizarSala(sala: ISala): Promise<ISala> {
         const query = "UPDATE Rooms set numero = ?, capacidade_maxima = ?, tipo = ? where id = ?";
 
         try {
             const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo, sala.id])
             console.log(`Sala com ID ${sala.id} atualizada com sucesso`);
-            return new Promise<Sala>((resolve) => {
+            return new Promise<ISala>((resolve) => {
                 resolve(resultado[0]);
             })
         } catch (err: any){
@@ -102,7 +102,7 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async deletarSala(sala: Sala): Promise<any> {
+    async deletarSala(sala: ISala): Promise<any> {
         const query = "DELETE FROM Rooms where id = ?";
 
         try {
@@ -117,7 +117,7 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async filtrarSalas(): Promise<Sala[]> {
+    async filtrarSalas(): Promise<ISala[]> {
     
         const query = "SELECT * FROM Rooms";
 

@@ -3,33 +3,28 @@ import { Reserva } from "../model/classes/Reserva";
 import { ReservaRepository } from "../repository/reservaRepository";
 import { UserRepository } from "../repository/userRepository";
 import { SalaRepository } from "../repository/salaRepository";
+import { CriadorReserva } from "../patterns/methodFactory/criadorReserva";
+import { ReservaValidator } from "../patterns/chainOfResponsibility/ReservaValidator";
+import { UserValidator } from "../patterns/chainOfResponsibility/UserValidator";
+import { SalaValidator } from "../patterns/chainOfResponsibility/SalaValidator";
 
 export class ReservaService {
     private reservaRepository = ReservaRepository.getInstance();
     private userRepository = UserRepository.getInstance();
     private salaRepository = SalaRepository.getInstance();
+    private criadorReserva = new CriadorReserva();
+    private validorCampos = new ReservaValidator(); // valida os dados da reserva enviados
+    private validorUsuario = new UserValidator();
+    private validorSala = new SalaValidator();
     
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
-        const {solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
 
-        if(!solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
-        }
+        this.validorCampos.validate(reservaData);
+        await this.validorUsuario.validate(reservaData);
+        await this.validorSala.validate(reservaData);
 
-        const user = await this.userRepository.filtraUsuarioById(userId);
-
-        if(!user){
-            throw new Error(`Usuário com ID ${userId} não encontrado.`);
-        }
-
-        const sala = await this.salaRepository.filtrarSalaById(salaId)
-
-        if(!sala){
-            throw new Error(`Sala com ID ${salaId} não encontrada`);
-        }
-
-        const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim, undefined, solicitanteId);
+        const reserva = this.criadorReserva.criarReserva(reservaData)
 
         const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
         console.log('Reserva registrada: ', reservaRegistrada); 
@@ -58,12 +53,16 @@ export class ReservaService {
         })
     }
 
-    async atualizarReserva(reservaData:any) {
-        const {id, solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
+    async atualizarReserva(reservaData:any): Promise<Reserva> {
+        const {id} = reservaData;
 
-        if(!id || !solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
+        if(!id) {
+            throw new Error("O ID da reserva não foi informado")
         }
+
+        this.validorCampos.validate(reservaData);
+        await this.validorUsuario.validate(reservaData);
+        await this.validorSala.validate(reservaData);
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
 
@@ -71,25 +70,11 @@ export class ReservaService {
             throw new Error(`Reserva com ID ${id} não encontrada`)
         }
 
-        const usuarioExiste = await this.userRepository.filtraUsuarioById(userId)
+        const reserva = this.criadorReserva.criarReserva(reservaData)
 
-        if(!usuarioExiste) {
-            throw new Error(`Usuario com ID ${id} não encontrado`)
-        }
+        await this.reservaRepository.atualizarReserva(reserva);
 
-        const salaExiste = await this.salaRepository.filtrarSalaById(parseInt(salaId))
-
-        if(!salaExiste) {
-            throw new Error(`Sala com ID ${id} não encontrado`)
-        }
-
-        const reserva = new Reserva(parseInt(userId), parseInt(salaId), dataSolicitacao, dataReserva, horarioInicio, horarioFim, parseInt(id), parseInt(solicitanteId));
-
-        const resposta = await this.reservaRepository.atualizarReserva(reserva);
-
-        if (resposta.affectedRows === 0) {
-            throw new Error("Reserva não encontrada ou já deletada.");
-        }
+        return reserva;
     }
 
     async deletarReserva(reservaData: any) {
@@ -105,7 +90,7 @@ export class ReservaService {
             throw new Error(`Reserva com ID ${id} não encontrada`)
         }
 
-        const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim, id, solicitanteId);
+        const reserva = this.criadorReserva.criarReserva(reservaData)
 
         const resposta = await this.reservaRepository.deletarReserva(reserva);
 
