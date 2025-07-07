@@ -11,7 +11,7 @@ export class ReservaService {
     private validorCampos = new CampoValidator(); // valida os dados da reserva enviados
     private validorUsuario = new UserValidator(); // valida se o usuario informado existe
     private validorSala = new SalaValidator(); // valida se a sala informada existe
-    
+
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
 
@@ -19,18 +19,18 @@ export class ReservaService {
         await this.validorUsuario.validate(reservaData);
         await this.validorSala.validate(reservaData);
 
-        const {sala_id, data_da_reserva, horario_inicio} = reservaData
+        const { sala_id, data_da_reserva, horario_inicio } = reservaData
 
         const reservaDataTimeExiste = await this.reservaRepository.listarReservasPorSalaDataTime(sala_id, data_da_reserva, horario_inicio)
 
-        if(reservaDataTimeExiste) {
+        if (reservaDataTimeExiste) {
             throw new Error(`Sala já reserva para data: ${data_da_reserva} no horario: ${horario_inicio}`)
         }
 
         const reserva = this.criadorReserva.criarReserva(reservaData)
 
         const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
-        console.log('Reserva registrada: ', reservaRegistrada); 
+        console.log('Reserva registrada: ', reservaRegistrada);
         return new Promise<Reserva>((resolve) => {
             resolve(reservaRegistrada);
         });
@@ -38,14 +38,14 @@ export class ReservaService {
 
     async filtrarReservaPorId(reservaId: string | any): Promise<Reserva> {
 
-        if(!reservaId) {
+        if (!reservaId) {
             throw new Error(`ID ${reservaId} inválido`);
         }
 
         const id = typeof reservaId === 'string' ? parseInt(reservaId) : reservaId;
         const reserva = await this.reservaRepository.filtrarReservaById(id);
 
-        if(!reserva){
+        if (!reserva) {
             throw new Error("Reserva não localizada");
         }
 
@@ -55,10 +55,10 @@ export class ReservaService {
         })
     }
 
-    async atualizarReserva(reservaData:any): Promise<Reserva> {
-        const {id} = reservaData;
+    async atualizarReserva(reservaData: any): Promise<Reserva> {
+        const { id } = reservaData;
 
-        if(!id) {
+        if (!id) {
             throw new Error("O ID da reserva não foi informado")
         }
 
@@ -68,7 +68,7 @@ export class ReservaService {
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
 
-        if(!reservaExiste) {
+        if (!reservaExiste) {
             throw new Error(`Reserva com ID ${id} não encontrada`)
         }
 
@@ -79,16 +79,22 @@ export class ReservaService {
     }
 
     async deletarReserva(reservaData: any) {
-        const {id} = reservaData;
+        const { id } = reservaData;
 
-        if(!id) {
+        if (!id) {
             throw new Error("O ID da reserva não foi informado")
+        }
+
+        const usuarioExiste = await this.userRepository.filtraUsuarioById(solicitanteId)
+
+        if (!usuarioExiste) {
+            throw new Error(`Usuario com id ${solicitanteId} não encontrado`)
         }
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
 
-        if(!reservaExiste) {
-            throw new Error(`Reserva com ID ${id} não encontrada`)
+        if (!reservaExiste) {
+            throw new Error(`Reserva com id ${id} não encontrada`)
         }
 
         const reserva = this.criadorReserva.criarReserva(reservaData)
@@ -98,13 +104,13 @@ export class ReservaService {
             throw new Error("Reserva não encontrada ou já deletada.");
         }
 
-        console.log('Reserva Deletada com sucesso!'); 
+        console.log('Reserva Deletada com sucesso!');
     }
 
     async verificarReservas(reservaData: any): Promise<Reserva[]> {
-        const {salaId, data, time} = reservaData;
+        const { salaId, data, time } = reservaData;
 
-        if(!salaId || !data) {
+        if (!salaId || !data) {
             throw new Error("Dados da reserva incompletos");
         }
 

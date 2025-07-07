@@ -4,24 +4,24 @@ import { AbstractSubject } from "../patterns/observer/AbstractSubject";
 import { LoggerObserver } from "../patterns/observer/LoggerObserver";
 
 export class SalaRepository extends AbstractSubject {
-    private static instance : SalaRepository;
+    private static instance: SalaRepository;
 
-    private constructor(){
+    private constructor() {
         super();
         this.createTable();
-        
+
         // Adicionar o LoggerObserver como observador
         const logger = LoggerObserver.getInstance();
         this.attach(logger);
     }
-    
+
     public static getInstance(): SalaRepository {
-        if(!this.instance) {
+        if (!this.instance) {
             this.instance = new SalaRepository();
         }
         return this.instance;
     }
-    
+
     private async createTable() {
         const query = `
             CREATE TABLE IF NOT EXISTS tcp2_db.Rooms
@@ -43,11 +43,11 @@ export class SalaRepository extends AbstractSubject {
     async cadastrarSala(sala: ISala): Promise<ISala> {
         const query = "INSERT INTO tcp2_db.Rooms (numero, capacidade_maxima, tipo) VALUES (?,?,?)";
 
-        try{
+        try {
             const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo]);
             console.log("Sala cadastrada com sucesso");
             sala.id = resultado.insertId;
-            
+
             // Notificar observadores sobre a criação da sala
             this.notify('criar_sala', {
                 id: sala.id,
@@ -61,73 +61,75 @@ export class SalaRepository extends AbstractSubject {
             })
         } catch (err: any) {
             console.log("Erro ao cadastrar sala: ", err);
-            
+
             // Notificar observadores sobre o erro
             this.notify('erro_criar_sala', {
                 numero: sala.numero,
                 tipo: sala.tipo,
                 erro: err.message
             });
-            
+
             throw err;
         }
     }
 
     async filtrarSalaById(salaId: number): Promise<ISala> {
-    
+
         const query = "SELECT * FROM Rooms where id = ?";
 
-        try{
-            const resultado = await executarComandoSQL(query, [salaId]);
+        if (resultado && resultado.length > 0) {
             return resultado[0];
-            
-        } catch (err: any) {
-            console.log("Erro ao filtrar sala: ", err);
-            throw err;
         }
+
+        return null;
+
+    } catch(err: any) {
+        console.log("!!! ERRO dentro de filtrarSalaById: ", err, "!!!");
+        throw err;
     }
+}
 
-    async atualizarSala(sala: ISala): Promise<ISala> {
-        const query = "UPDATE Rooms set numero = ?, capacidade_maxima = ?, tipo = ? where id = ?";
+    async atualizarSala(sala: ISala): Promise < ISala > {
+    const query = "UPDATE Rooms set numero = ?, capacidade_maxima = ?, tipo = ? where id = ?";
 
-        try {
-            const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo, sala.id])
+    try {
+        const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo, sala.id])
             console.log(`Sala com ID ${sala.id} atualizada com sucesso`);
-            return new Promise<ISala>((resolve) => {
-                resolve(resultado[0]);
-            })
-        } catch (err: any){
-            console.log(`Erro ao tentar atualizar sala com ID ${sala.id}`)
-            throw err;
-        }
+        return new Promise<ISala>((resolve) => {
+            resolve(resultado[0]);
+        })
+    } catch(err: any) {
+        console.log(`Erro ao tentar atualizar sala com ID ${sala.id}`)
+        throw err;
     }
+}
 
-    async deletarSala(sala: ISala): Promise<any> {
-        const query = "DELETE FROM Rooms where id = ?";
+    async deletarSala(sala: ISala): Promise < any > {
+    const query = "DELETE FROM Rooms where id = ?";
 
-        try {
-            const resultado = await executarComandoSQL(query, [sala.id]);
-            console.log(`Sala com ID ${sala.id} deletada com sucesso`);
-            return new Promise<any>((resolve) => {
-                resolve(resultado[0]);
-            })
-        } catch (err: any) {
-            console.log(`Erro ao tentar deletar sala com ID ${sala.id}`);
-            throw err;
-        }
+    try {
+        const resultado = await executarComandoSQL(query, [sala.id]);
+        console.log(`Sala com ID ${sala.id} deletada com sucesso`);
+        return new Promise<any>((resolve) => {
+            resolve(resultado[0]);
+        })
+    } catch(err: any) {
+        console.log(`Erro ao tentar deletar sala com ID ${sala.id}`);
+        throw err;
     }
+}
 
-    async filtrarSalas(): Promise<ISala[]> {
-    
-        const query = "SELECT * FROM Rooms";
+    async filtrarSalas(): Promise < ISala[] > {
 
-        try{
-            const resultado = await executarComandoSQL(query, []);
-            console.log("Salas filtradas com sucesso", resultado);
-            return resultado;
-        } catch (err: any) {
-            console.log("Erro ao filtrar salas: ", err);
-            throw err;
-        }
+    const query = "SELECT * FROM Rooms";
+
+    try {
+        const resultado = await executarComandoSQL(query, []);
+        console.log("Salas filtradas com sucesso", resultado);
+        return resultado;
+    } catch(err: any) {
+        console.log("Erro ao filtrar salas: ", err);
+        throw err;
     }
+}
 }

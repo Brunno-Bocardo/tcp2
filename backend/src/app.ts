@@ -4,7 +4,7 @@ import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
 import { inicializarSistema } from "./database/inicializarDados";
-import { atualizarReserva, cancelarReserva, filtrarReservaPorId, reservarSala, verificarReservas } from "./controller/reservaControl";
+import { atualizarReserva, cancelarReserva, filtrarReservaPorId, filtrarReservasPorIdUser, reservarSala, verificarReservas } from "./controller/reservaControl";
 import { atualizarUsuario, cadastrarUsuario, deletarUsuario, filtrarUsuario, filtrarUsuarios, verificarUsuario } from "./controller/userControl";
 import { atualizarSala, cadastrarSala, excluirSala, filtrarSala, filtrarSalas } from "./controller/salaControl";
 import { filtrarLogs } from "./controller/logControl";
@@ -39,10 +39,10 @@ inicializarSistema();
 
 // CONFIGURA CORS PRA PERMITIR O FRONT
 app.use(cors({
-    origin: "http://localhost:3000",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
+  origin: "http://localhost:3000",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+})
 );
 
 // ========================= ROTAS =========================
