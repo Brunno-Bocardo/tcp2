@@ -54,7 +54,7 @@ app.post("/api/reserva", reservarSala) //ok
 app.get("/api/reserva", filtrarReservaPorId) //ok
 app.put("/api/reserva", atualizarReserva) //ok
 app.delete("/api/reserva", cancelarReserva) //ok
-app.get("/api/reservas/:salaId/:data", verificarReservas) //ok
+app.get("/api/reservas/:salaId/:data/:time", verificarReservas) //ok
 
 // ENDPOINTS USUÁRIO - CRUD COMPLETO
 app.post("/api/user", cadastrarUsuario) //ok

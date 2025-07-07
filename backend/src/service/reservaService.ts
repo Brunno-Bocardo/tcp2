@@ -19,6 +19,14 @@ export class ReservaService {
         await this.validorUsuario.validate(reservaData);
         await this.validorSala.validate(reservaData);
 
+        const {sala_id, data_da_reserva, horario_inicio} = reservaData
+
+        const reservaDataTimeExiste = await this.reservaRepository.listarReservasPorSalaDataTime(sala_id, data_da_reserva, horario_inicio)
+
+        if(reservaDataTimeExiste) {
+            throw new Error(`Sala já reserva para data: ${data_da_reserva} no horario: ${horario_inicio}`)
+        }
+
         const reserva = this.criadorReserva.criarReserva(reservaData)
 
         const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
@@ -94,13 +102,13 @@ export class ReservaService {
     }
 
     async verificarReservas(reservaData: any): Promise<Reserva[]> {
-        const {salaId, data} = reservaData;
+        const {salaId, data, time} = reservaData;
 
         if(!salaId || !data) {
             throw new Error("Dados da reserva incompletos");
         }
 
-        const reservas = await this.reservaRepository.listarReservasPorSalaEData(parseInt(salaId), data);
+        const reservas = await this.reservaRepository.listarReservasPorSalaDataTime(parseInt(salaId), data, time);
         return new Promise<Reserva[]>((resolve) => {
             resolve(reservas)
         });
