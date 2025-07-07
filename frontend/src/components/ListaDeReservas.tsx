@@ -107,9 +107,9 @@ const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas,
                                         </p>
                                     </div>
                                     <div className="flex gap-2 self-end sm:self-center">
-                                        <button onClick={() => handleEditarClick(reserva)} className="w-full py-3 bg-[#80cbc4] text-[#1e1e2f] rounded hover:bg-[#00acc1] transition-colors">
+                                        {/* <button onClick={() => handleEditarClick(reserva)} className="w-full py-3 bg-[#80cbc4] text-[#1e1e2f] rounded hover:bg-[#00acc1] transition-colors">
                                             Editar
-                                        </button>
+                                        </button> */}
                                         <button onClick={() => handleCancelarClick(reserva.id)} className="w-full py-3 bg-red-700  text-[#1e1e2f] rounded hover:bg-red-500 transition-colors">
                                             Cancelar
                                         </button>

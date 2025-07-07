@@ -24,7 +24,7 @@ export class ReservaService {
         const reservaDataTimeExiste = await this.reservaRepository.listarReservasPorSalaDataTime(sala_id, data_da_reserva, horario_inicio)
 
         if (reservaDataTimeExiste) {
-            throw new Error(`Sala já reserva para data: ${data_da_reserva} no horario: ${horario_inicio}`)
+            throw new Error(`Sala já reservada para data: ${data_da_reserva} no horario: ${horario_inicio}`)
         }
 
         const reserva = this.criadorReserva.criarReserva(reservaData)
@@ -55,6 +55,27 @@ export class ReservaService {
         })
     }
 
+    async filtrarReservasPorIdUser(solicitanteId: string): Promise<Reserva[]> {
+
+
+        if (!solicitanteId) {
+            throw new Error(`ID ${solicitanteId} inválido`);
+        }
+
+        const id = typeof solicitanteId === 'string' ? parseInt(solicitanteId) : solicitanteId;
+
+        const reservas = await this.reservaRepository.filtrarReservasByIdUser(id);
+
+        if (!reservas) {
+            throw new Error("Reservas não localizadas");
+        }
+
+        console.log("Reservas encontradas com sucesso!");
+        return new Promise<Reserva[]>((resolve) => {
+            resolve(reservas);
+        })
+    }
+
     async atualizarReserva(reservaData: any): Promise<Reserva> {
         const { id } = reservaData;
 
@@ -79,13 +100,13 @@ export class ReservaService {
     }
 
     async deletarReserva(reservaData: any) {
-        const { id } = reservaData;
+        const { id, solicitanteId } = reservaData;
 
         if (!id) {
-            throw new Error("O ID da reserva não foi informado")
+            throw new Error("Dados da reserva incompletos")
         }
 
-        const usuarioExiste = await this.userRepository.filtraUsuarioById(solicitanteId)
+        const usuarioExiste = await this.reservaRepository.filtrarReservasByIdUser(solicitanteId)
 
         if (!usuarioExiste) {
             throw new Error(`Usuario com id ${solicitanteId} não encontrado`)
@@ -97,8 +118,7 @@ export class ReservaService {
             throw new Error(`Reserva com id ${id} não encontrada`)
         }
 
-        const reserva = this.criadorReserva.criarReserva(reservaData)
-        const resposta = await this.reservaRepository.deletarReserva(reserva);
+        const resposta = await this.reservaRepository.deletarReserva(parseInt(id));
 
         if (resposta.affectedRows === 0) {
             throw new Error("Reserva não encontrada ou já deletada.");
