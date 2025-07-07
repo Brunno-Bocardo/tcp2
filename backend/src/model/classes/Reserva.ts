@@ -23,7 +23,7 @@ export class Reserva {
   
 
   formatadorDeData(data:string): Date {
-    const dataConvertida = parse(data, 'dd/MM/yyyy', new Date());
+    const dataConvertida = parse(data, 'yyyy-MM-dd', new Date());
 
     if (!isValid(dataConvertida)) {
       throw new Error(`Data inválida: ${data}`);

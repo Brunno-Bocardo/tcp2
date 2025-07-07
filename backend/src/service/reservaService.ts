@@ -1,26 +1,21 @@
-import { EventEmitterAsyncResource } from "node:stream";
 import { Reserva } from "../model/classes/Reserva";
 import { ReservaRepository } from "../repository/reservaRepository";
-import { UserRepository } from "../repository/userRepository";
-import { SalaRepository } from "../repository/salaRepository";
 import { CriadorReserva } from "../patterns/methodFactory/criadorReserva";
-import { ReservaValidator } from "../patterns/chainOfResponsibility/ReservaValidator";
 import { UserValidator } from "../patterns/chainOfResponsibility/UserValidator";
 import { SalaValidator } from "../patterns/chainOfResponsibility/SalaValidator";
+import { CampoValidator } from "../patterns/chainOfResponsibility/CampoValidator";
 
 export class ReservaService {
     private reservaRepository = ReservaRepository.getInstance();
-    private userRepository = UserRepository.getInstance();
-    private salaRepository = SalaRepository.getInstance();
-    private criadorReserva = new CriadorReserva();
-    private validorCampos = new ReservaValidator(); // valida os dados da reserva enviados
-    private validorUsuario = new UserValidator();
-    private validorSala = new SalaValidator();
+    private criadorReserva = new CriadorReserva(); // cria reservas
+    private validorCampos = new CampoValidator(); // valida os dados da reserva enviados
+    private validorUsuario = new UserValidator(); // valida se o usuario informado existe
+    private validorSala = new SalaValidator(); // valida se a sala informada existe
     
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
 
-        this.validorCampos.validate(reservaData);
+        this.validorCampos.validate(reservaData)
         await this.validorUsuario.validate(reservaData);
         await this.validorSala.validate(reservaData);
 
@@ -40,7 +35,6 @@ export class ReservaService {
         }
 
         const id = typeof reservaId === 'string' ? parseInt(reservaId) : reservaId;
-
         const reserva = await this.reservaRepository.filtrarReservaById(id);
 
         if(!reserva){
@@ -60,7 +54,7 @@ export class ReservaService {
             throw new Error("O ID da reserva não foi informado")
         }
 
-        this.validorCampos.validate(reservaData);
+        this.validorCampos.validate(reservaData)
         await this.validorUsuario.validate(reservaData);
         await this.validorSala.validate(reservaData);
 
@@ -71,17 +65,16 @@ export class ReservaService {
         }
 
         const reserva = this.criadorReserva.criarReserva(reservaData)
-
         await this.reservaRepository.atualizarReserva(reserva);
 
         return reserva;
     }
 
     async deletarReserva(reservaData: any) {
-        const {id, solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
+        const {id} = reservaData;
 
-        if(!id || !solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
+        if(!id) {
+            throw new Error("O ID da reserva não foi informado")
         }
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
@@ -91,7 +84,6 @@ export class ReservaService {
         }
 
         const reserva = this.criadorReserva.criarReserva(reservaData)
-
         const resposta = await this.reservaRepository.deletarReserva(reserva);
 
         if (resposta.affectedRows === 0) {

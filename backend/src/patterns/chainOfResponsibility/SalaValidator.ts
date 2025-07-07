@@ -5,7 +5,7 @@ export class SalaValidator extends AbstractValidatorAsync {
     private salaRepository = SalaRepository.getInstance();
 
     public async validate(request: any): Promise<void> {
-        const {salaId} = request;
+        const {sala_id: salaId} = request;
 
         console.log("Verificando sala");
 

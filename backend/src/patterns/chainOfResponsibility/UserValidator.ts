@@ -5,7 +5,7 @@ export class UserValidator extends AbstractValidatorAsync{
     private userRespository = UserRepository.getInstance();
 
     public async validate(request: any): Promise<void> {
-        const { userId } = request;
+        const { user_id: userId } = request;
 
         console.log("Verificando usuário");
 

@@ -1,4 +1,5 @@
 import { ISala } from "../model/interfaces/ISala";
+import { CampoValidator } from "../patterns/chainOfResponsibility/CampoValidator";
 import { CriadorAuditorio } from "../patterns/methodFactory/criadorAuditorio";
 import { CriadorLaboratorio } from "../patterns/methodFactory/criadorLaboratorio";
 import { CriadorSalaDeAula } from "../patterns/methodFactory/criadorSalaDeAula";
@@ -9,13 +10,14 @@ export class SalaService {
     private CriadorAuditorio = new CriadorAuditorio();
     private CriadorLaboratorio = new CriadorLaboratorio();
     private CriadorSalaDeAula = new CriadorSalaDeAula();
+    private validorCampos = new CampoValidator();
+  
 
     async cadastrarSala(salaData: any): Promise<ISala> {
-        const {numero, capacidadeMaxima, tipo} = salaData;
+        
+        this.validorCampos.validate(salaData)
 
-        if (!numero || !capacidadeMaxima || !tipo) {
-            throw new Error("Dados incompletos da sala");
-        }
+        const {numero, capacidadeMaxima, tipo} = salaData;
 
         let sala: ISala;
 
@@ -58,10 +60,13 @@ export class SalaService {
     }
 
     async atualizarSala(salaData: any): Promise<ISala>{
+
+        this.validorCampos.validate(salaData)
+
         const {salaId, numero, capacidadeMaxima, tipo} = salaData;
 
-        if (!salaId || !numero || !capacidadeMaxima || !tipo) {
-            throw new Error("Dados incompletos da sala");
+        if (!salaId) {
+            throw new Error("O ID da sala precisa ser informado");
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(salaId)
@@ -89,10 +94,13 @@ export class SalaService {
           
 
     async deletarSala(salaData:any) {
+
+        this.validorCampos.validate(salaData)
+
         const {salaId, numero, capacidadeMaxima, tipo} = salaData;
 
-        if (!salaId || !numero || !capacidadeMaxima || !tipo) {
-            throw new Error("Dados incompletos da sala");
+        if (!salaId) {
+            throw new Error("O ID da sala precisa ser informado");
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(salaId)
