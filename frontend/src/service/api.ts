@@ -95,20 +95,16 @@ export async function listarReservasDoUsuarioAPI(userId: number): Promise<Reserv
     return reservasEmCamelCase;
 }
 
-export async function cancelarReservaAPI(reservaId: number, solicitanteId: number): Promise<any> {
-    const res = await fetch(`${API}/reserva`, {
-        method: 'DELETE',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reservaId, solicitanteId }),
+export async function cancelarReservaAPI(id: number): Promise<any> {
+    const reservaParaEnviar = {
+        id: id,
+    };
+
+    const res = await fetch(`${API}/reserva/`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reservaParaEnviar),
     });
 
-    if (!res.ok) {
-        const errorData = await res.json().catch(() => ({
-            message: res.statusText
-        }));
-        throw new Error(errorData.message || 'Erro ao cancelar a reserva');
-    }
     return res.json();
 }

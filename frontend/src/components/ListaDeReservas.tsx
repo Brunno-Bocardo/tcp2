@@ -57,18 +57,18 @@ const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas,
     }, [minhasReservas]);
 
 
-    const handleCancelarClick = async (reservaId: number) => {
+    const handleCancelarClick = async (id: number) => {
         if (!usuarioLogado) {
             alert("Você precisa estar logado para cancelar uma reserva.");
             return;
         }
-
+        console.log(`Tentando cancelar reserva com ID: ${id}`);
         if (window.confirm("Tem certeza que deseja cancelar esta reserva?")) {
             try {
-                await cancelarReservaAPI(reservaId, usuarioLogado.id);
+                await cancelarReservaAPI(id);
                 alert("Reserva cancelada com sucesso!");
 
-                setMinhasReservas(prevReservas => prevReservas.filter(r => r.id !== reservaId));
+                setMinhasReservas(prevReservas => prevReservas.filter(r => r.id !== id));
             } catch (err: any) {
                 alert(`Erro ao cancelar a reserva: ${err.message}`);
             }
@@ -110,7 +110,7 @@ const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas,
                                         <button onClick={() => handleEditarClick(reserva)} className="w-full py-3 bg-[#80cbc4] text-[#1e1e2f] rounded hover:bg-[#00acc1] transition-colors">
                                             Editar
                                         </button>
-                                        <button onClick={() => handleCancelarClick(reserva.id!)} className="w-full py-3 bg-red-700  text-[#1e1e2f] rounded hover:bg-red-500 transition-colors">
+                                        <button onClick={() => handleCancelarClick(reserva.id)} className="w-full py-3 bg-red-700  text-[#1e1e2f] rounded hover:bg-red-500 transition-colors">
                                             Cancelar
                                         </button>
                                     </div>
