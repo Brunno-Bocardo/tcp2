@@ -16,7 +16,7 @@ export class SalaValidator extends AbstractValidatorAsync {
         const sala = await this.salaRepository.filtrarSalaById(parseInt(salaId));
 
         if(!sala) {
-            throw new Error(`Sala com ID ${salaId} não encontrado`);
+            throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
     }
