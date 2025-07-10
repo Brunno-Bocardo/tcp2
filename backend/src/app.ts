@@ -4,7 +4,7 @@ import { ReservaRepository } from "./repository/reservaRepository";
 import { SalaRepository } from "./repository/salaRepository";
 import { UserRepository } from "./repository/userRepository";
 import { inicializarSistema } from "./database/inicializarDados";
-import { atualizarReserva, cancelarReserva, filtrarReservaPorId, filtrarReservasPorIdUser, listarTodasAsReservas, reservarSala, verificarReservas } from "./controller/reservaControl";
+import { atualizarReserva, cancelarReserva, filtrarReservaPorId, filtrarReservasPorIdUser, listarTodasAsReservas, reservarSala, verificarReservas, verificarReservas2 } from "./controller/reservaControl";
 import { atualizarUsuario, cadastrarUsuario, deletarUsuario, filtrarUsuario, filtrarUsuarios, verificarUsuario } from "./controller/userControl";
 import { atualizarSala, cadastrarSala, excluirSala, filtrarSala, filtrarSalas } from "./controller/salaControl";
 import { filtrarLogs } from "./controller/logControl";
@@ -54,9 +54,10 @@ app.post("/api/reserva", reservarSala) //ok
 app.get("/api/reserva", filtrarReservaPorId) //ok
 app.put("/api/reserva", atualizarReserva) //ok
 app.delete("/api/reserva", cancelarReserva) //ok
-app.get("/api/reservas", filtrarReservasPorIdUser) //ok -> filtra pelo id do solicitante da reserva
-app.get("/api/reservas/:salaId/:data", verificarReservas) //ok
-app.get("/api/reservas/all", listarTodasAsReservas) //ok 
+app.get("/api/reservas/all", listarTodasAsReservas)
+app.get("/api/reservas/:salaId/:data", verificarReservas2) //ok
+app.get("/api/reservas/:salaId/:data/:time", verificarReservas)
+app.get("/api/reservas", filtrarReservasPorIdUser)
 // ENDPOINTS USUÁRIO - CRUD COMPLETO
 app.post("/api/user", cadastrarUsuario) //ok
 app.get("/api/user", filtrarUsuario) //ok

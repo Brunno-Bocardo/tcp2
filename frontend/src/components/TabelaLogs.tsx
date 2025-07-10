@@ -1,4 +1,3 @@
-// src/components/TabelaLogs.tsx
 import React, { useEffect, useMemo, useState } from "react";
 import { Reserva, User } from "../types";
 

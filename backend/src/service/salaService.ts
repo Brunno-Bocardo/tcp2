@@ -11,18 +11,18 @@ export class SalaService {
     private CriadorLaboratorio = new CriadorLaboratorio();
     private CriadorSalaDeAula = new CriadorSalaDeAula();
     private validorCampos = new CampoValidator();
-  
+
 
     async cadastrarSala(salaData: any): Promise<ISala> {
-        
+
         this.validorCampos.validate(salaData)
 
-        const {numero, capacidadeMaxima, tipo} = salaData;
+        const { numero, capacidadeMaxima, tipo } = salaData;
 
         let sala: ISala;
 
         //method factory
-        if(tipo === "Auditorio"){
+        if (tipo === "Auditorio") {
             sala = this.CriadorAuditorio.criarSala(0, numero, capacidadeMaxima);
         } else if (tipo === "Laboratorio") {
             sala = this.CriadorLaboratorio.criarSala(0, numero, capacidadeMaxima);
@@ -31,7 +31,7 @@ export class SalaService {
         }
 
         //Incluir verificações antes de registrar reserva
-        
+
         const salaRegistrada = await this.salaRepository.cadastrarSala(sala);
         console.log("Sala Cadastrada", salaRegistrada)
         return new Promise<ISala>((resolve) => {
@@ -39,17 +39,17 @@ export class SalaService {
         });
     }
 
-    async filtrarSalaPorId(salaId: string): Promise<ISala>{
+    async filtrarSalaPorId(salaId: string): Promise<ISala> {
 
-        if(!salaId){
+        if (!salaId) {
             throw new Error(`ID ${salaId} inválido`)
         }
-        
+
         const id = parseInt(salaId);
 
         const sala = await this.salaRepository.filtrarSalaById(id)
 
-        if(!sala) {
+        if (!sala) {
             throw new Error("Sala não localizada");
         }
 
@@ -59,25 +59,25 @@ export class SalaService {
         });
     }
 
-    async atualizarSala(salaData: any): Promise<ISala>{
+    async atualizarSala(salaData: any): Promise<ISala> {
 
         this.validorCampos.validate(salaData)
 
-        const {salaId, numero, capacidadeMaxima, tipo} = salaData;
+        const { salaId, numero, capacidadeMaxima, tipo } = salaData;
 
         if (!salaId) {
             throw new Error("O ID da sala precisa ser informado");
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(salaId)
-        if(!salaExiste){
+        if (!salaExiste) {
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
         let sala: ISala;
 
         //method factory
-        if(tipo === "Auditorio"){
+        if (tipo === "Auditorio") {
             sala = this.CriadorAuditorio.criarSala(salaId, numero, capacidadeMaxima);
         } else if (tipo === "Laboratorio") {
             sala = this.CriadorLaboratorio.criarSala(salaId, numero, capacidadeMaxima);
@@ -91,27 +91,27 @@ export class SalaService {
             resolve(sala)
         });
     }
-          
 
-    async deletarSala(salaData:any) {
+
+    async deletarSala(salaData: any) {
 
         this.validorCampos.validate(salaData)
 
-        const {salaId, numero, capacidadeMaxima, tipo} = salaData;
+        const { salaId, numero, capacidadeMaxima, tipo } = salaData;
 
         if (!salaId) {
             throw new Error("O ID da sala precisa ser informado");
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(salaId)
-        if(!salaExiste){
+        if (!salaExiste) {
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
         let sala: ISala;
 
         //method factory
-        if(tipo === "Auditorio"){
+        if (tipo === "Auditorio") {
             sala = this.CriadorAuditorio.criarSala(salaId, numero, capacidadeMaxima);
         } else if (tipo === "Laboratorio") {
             sala = this.CriadorLaboratorio.criarSala(salaId, numero, capacidadeMaxima);

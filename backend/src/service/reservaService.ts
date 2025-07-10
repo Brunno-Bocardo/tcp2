@@ -139,8 +139,21 @@ export class ReservaService {
             resolve(reservas)
         });
     }
+    async verificarReservas2(reservaData: any): Promise<Reserva[]> {
+        const { salaId, data } = reservaData;
+
+        if (!salaId || !data) {
+            throw new Error("Dados da reserva incompletos");
+        }
+
+        const reservas = await this.reservaRepository.listarReservasPorSalaEData(parseInt(salaId), data);
+        return new Promise<Reserva[]>((resolve) => {
+            resolve(reservas)
+        });
+    }
     async listarTodasAsReservas(): Promise<Reserva[]> {
         const reservas = await this.reservaRepository.listarReservas();
         return reservas;
     }
+
 }

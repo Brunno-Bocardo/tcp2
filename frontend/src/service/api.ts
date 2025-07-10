@@ -15,7 +15,6 @@ export async function addSala(sala: Omit<Sala, "id">): Promise<Sala> {
     });
     return res.json();
 }
-
 export async function getSalas(): Promise<SalasResponse> {
     const res = await fetch(`${API}/salas`);
     if (!res.ok) throw new Error("Erro ao buscar salas");
@@ -99,7 +98,7 @@ export async function cancelarReservaAPI(id: number): Promise<any> {
         id: id,
     };
 
-    const res = await fetch(`${API}/reserva`, {
+    const res = await fetch(`${API}/reserva/`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(reservaParaEnviar),

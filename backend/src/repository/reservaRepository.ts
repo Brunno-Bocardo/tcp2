@@ -153,6 +153,18 @@ export class ReservaRepository extends AbstractSubject {
       throw err;
     }
   }
+  async listarReservasPorSalaEData(salaId: number, data: string): Promise<Reserva[]> {
+    const query = "SELECT * FROM tcp2_db.Reservations WHERE sala_id = ? AND data_da_reserva = ?";
+    try {
+      const resultado = await executarComandoSQL(query, [salaId, data]);
+      return new Promise<Reserva[]>((resolve) => {
+        resolve(resultado);
+      })
+    } catch (err: any) {
+      console.error("Erro ao listar reservas por sala e data");
+      throw err;
+    }
+  }
 
   async listarReservas(): Promise<Reserva[]> {
     const query = "SELECT * FROM tcp2_db.Reservations";

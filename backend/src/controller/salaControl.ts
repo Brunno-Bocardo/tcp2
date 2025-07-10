@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { SalaService } from "../service/salaService";
-
 const salaService = new SalaService();
 
 export async function cadastrarSala(req: Request, res: Response) {
@@ -13,8 +12,8 @@ export async function cadastrarSala(req: Request, res: Response) {
             }
         )
 
-    } catch(error:any){
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -27,8 +26,8 @@ export async function filtrarSala(req: Request, res: Response) {
                 sala: sala
             }
         )
-    } catch (error:any){
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -41,8 +40,8 @@ export async function atualizarSala(req: Request, res: Response) {
                 sala: sala
             }
         )
-    } catch (error:any){
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -56,8 +55,8 @@ export async function excluirSala(req: Request, res: Response) {
                 resposta: resposta
             }
         )
-    } catch (error:any){
-        res.status(400).json({message:error.message})
+    } catch (error: any) {
+        res.status(400).json({ message: error.message })
     }
 }
 
@@ -68,7 +67,7 @@ export async function filtrarSalas(req: Request, res: Response) {
             mensagem: "Salas encontradas com sucesso",
             salas: salas
         });
-    } catch (error:any){
-        res.status(500).json({error: "Erro ao buscar salas"});
+    } catch (error: any) {
+        res.status(500).json({ error: "Erro ao buscar salas" });
     }
 }
