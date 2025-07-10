@@ -31,7 +31,7 @@ export class Reserva {
 
     return dataConvertida;
   }
-  
+
   formatadorDeTempo(tempo: string) {
     const tempoConvertido = parse(tempo, "HH:mm", new Date());
 

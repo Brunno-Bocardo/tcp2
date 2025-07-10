@@ -1,5 +1,5 @@
 import { executarComandoSQL } from "../database/mysql";
-import { Sala } from "../model/interfaces/ISala";
+import { ISala } from "../model/interfaces/ISala";
 import { AbstractSubject } from "../patterns/observer/AbstractSubject";
 import { LoggerObserver } from "../patterns/observer/LoggerObserver";
 
@@ -40,7 +40,7 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async cadastrarSala(sala: Sala): Promise<Sala> {
+    async cadastrarSala(sala: ISala): Promise<ISala> {
         const query = "INSERT INTO tcp2_db.Rooms (numero, capacidade_maxima, tipo) VALUES (?,?,?)";
 
         try {
@@ -56,7 +56,7 @@ export class SalaRepository extends AbstractSubject {
                 tipo: sala.tipo
             });
 
-            return new Promise<Sala>((resolve) => {
+            return new Promise<ISala>((resolve) => {
                 resolve(sala);
             })
         } catch (err: any) {
@@ -73,39 +73,36 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async filtrarSalaById(salaId: number): Promise<Sala | null> {
-        const query = "SELECT * FROM Rooms WHERE id = ?";
+    async filtrarSalaById(salaId: number): Promise<ISala> {
+
+        const query = "SELECT * FROM Rooms where id = ?";
 
         try {
-            const resultado: Sala[] = await executarComandoSQL(query, [salaId]);
-
-            if (resultado && resultado.length > 0) {
-                return resultado[0];
-            }
-
-            return null;
+            const resultado = await executarComandoSQL(query, [salaId]);
+            return resultado[0];
 
         } catch (err: any) {
-            console.log("!!! ERRO dentro de filtrarSalaById: ", err, "!!!");
+            console.log("Erro ao filtrar sala: ", err);
             throw err;
         }
     }
-    async atualizarSala(sala: Sala): Promise<Sala> {
+
+    async atualizarSala(sala: ISala): Promise<ISala> {
         const query = "UPDATE Rooms set numero = ?, capacidade_maxima = ?, tipo = ? where id = ?";
 
         try {
             const resultado = await executarComandoSQL(query, [sala.numero, sala.capacidadeMaxima, sala.tipo, sala.id])
             console.log(`Sala com ID ${sala.id} atualizada com sucesso`);
-            return new Promise<Sala>((resolve) => {
+            return new Promise<ISala>((resolve) => {
                 resolve(resultado[0]);
             })
         } catch (err: any) {
-            console.log(`Erro ao tentar atualizar sala com ID ${sala.id}`)
+            console.log(`Erro ao tentar atualizar sala com ID ${sala.id}`);
             throw err;
         }
     }
 
-    async deletarSala(sala: Sala): Promise<any> {
+    async deletarSala(sala: ISala): Promise<any> {
         const query = "DELETE FROM Rooms where id = ?";
 
         try {
@@ -120,7 +117,7 @@ export class SalaRepository extends AbstractSubject {
         }
     }
 
-    async filtrarSalas(): Promise<Sala[]> {
+    async filtrarSalas(): Promise<ISala[]> {
 
         const query = "SELECT * FROM Rooms";
 

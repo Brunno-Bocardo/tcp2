@@ -62,8 +62,10 @@ app.post("/api/user", cadastrarUsuario) //ok
 app.get("/api/user", filtrarUsuario) //ok
 app.put("/api/user", atualizarUsuario) //ok
 app.delete("/api/user", deletarUsuario) //ok
-app.post("/api/login", verificarUsuario) //ok
+app.post("/api/usuarios/verificar", verificarUsuario) //ok
 app.get("/api/usuarios", filtrarUsuarios) //ok
+
+app.post("/api/login", verificarUsuario) //ok
 
 // ENDPOINTS SALA - CRUD COMPLETO
 app.post("/api/sala", cadastrarSala) //ok

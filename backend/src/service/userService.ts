@@ -2,18 +2,24 @@ import { CoordenadorFactory } from "../patterns/abstractFactory/coordenadorFacto
 import { ProfessorFactory } from "../patterns/abstractFactory/professorFactory";
 import { User } from "../model/interfaces/IUser";
 import { UserRepository } from "../repository/userRepository";
+import { CampoValidator } from "../patterns/chainOfResponsibility/CampoValidator";
+import { EmailValidator } from "../patterns/chainOfResponsibility/EmailValidator";
+import { SenhaValidator } from "../patterns/chainOfResponsibility/SenhaValidator";
 
 export class UserService {
   private usuarioRepository = UserRepository.getInstance();
   private coordenadorFabrica = new CoordenadorFactory();
   private professorFabrica = new ProfessorFactory();
+  private validorCampos = new CampoValidator();
+  private validorEmail = new EmailValidator();
+  private validorSenha = new SenhaValidator();
 
   async cadastrarUsuario(userData: any): Promise<User> {
-    const { nome, email, curso, senha, tipo } = userData;
 
-    if(!nome || !email || !curso || !senha || !tipo){
-      throw new Error("Dados do usuário incompletos");
-    }
+    this.validorCampos.setNext(this.validorEmail).setNext(this.validorSenha);
+    this.validorCampos.validate(userData);
+
+    const { nome, email, curso, senha, tipo } = userData;
 
     // Aplicando abstract factory
     const usuario =
@@ -97,10 +103,14 @@ export class UserService {
   }
 
   async atualizarUsuario(userData: any): Promise<User> {
+    
+    this.validorCampos.setNext(this.validorEmail).setNext(this.validorSenha);
+    this.validorCampos.validate(userData);
+    
     const {id, nome, email, curso, senha, tipo} = userData;
 
-    if(!id || !nome || !email || !curso || !senha || !tipo){
-      throw new Error("Dados incompletos do usuário");
+    if(!id){
+      throw new Error("Informe o ID do usuário");
     }
 
     const userExiste = await this.usuarioRepository.filtraUsuarioById(parseInt(id))
@@ -121,10 +131,14 @@ export class UserService {
   }
 
   async deletarUsuario(userData: any): Promise<User> {
+
+    this.validorCampos.setNext(this.validorEmail).setNext(this.validorSenha);
+    this.validorCampos.validate(userData);
+
     const {id, nome, email, curso, senha, tipo} = userData;
 
-    if(!id || !nome || !email || !curso || !senha || !tipo){
-      throw new Error("Dados incompletos do usuário");
+    if(!id){
+      throw new Error("Informe o ID do usuário");
     }
 
     const userExiste = await this.usuarioRepository.filtraUsuarioById(parseInt(id))

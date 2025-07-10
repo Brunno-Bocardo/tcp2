@@ -2,23 +2,25 @@ import { LoginRequestDto } from "../../model/dto/LoginRequestDto";
 import { ILogin } from "../../model/interfaces/ILogin";
 import { User } from "../../model/interfaces/IUser";
 import { UserService } from "../../service/userService";
+import { EmailValidator } from "../chainOfResponsibility/EmailValidator";
+import { SenhaValidator } from "../chainOfResponsibility/SenhaValidator";
 
 export class ProxyLogin implements ILogin {
     private userService = new UserService(); // Instancia o serviço diretamente
+    private emailValidator = new EmailValidator();
+    private senhaValidator = new SenhaValidator();
 
     public async login(userData: LoginRequestDto): Promise<User> {
-        const {email, senha} = userData;
-        
-        console.log(`Tentativa de login para o usuário: ${email}`);
 
-        // Validação básica antes de delegar ao objeto real
-        if (!email || !senha) {
-            throw new Error("Email ou senha não podem estar vazios.")
-        }
+        // Validação básica com CoR antes de delegar ao objeto real
+        this.emailValidator.setNext(this.senhaValidator);
+        this.emailValidator.validate(userData);
+        
+        console.log(`Tentativa de login para o usuário: ${userData.email}`);
 
         try {
             // Delegando ao serviço diretamente
-            const usuarioLogado = await this.userService.userLogin(email, senha);
+            const usuarioLogado = await this.userService.userLogin(userData.email, userData.senha);
             console.log("Login realizado com sucesso:", usuarioLogado);
             return new Promise<User>((resolve) => {
                 resolve(usuarioLogado);
@@ -29,3 +31,4 @@ export class ProxyLogin implements ILogin {
         }
     }
 }
+

@@ -1,8 +1,8 @@
-import { Sala } from "./ISala";
+import { ISala } from "./ISala";
 import { User } from "./IUser";
 
 export interface ireserva {
-  sala: Sala;
+  sala: ISala;
   usuario: User;
   dataSolicitacao: string;
   dia: string;

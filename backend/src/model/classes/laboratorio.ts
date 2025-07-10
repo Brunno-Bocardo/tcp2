@@ -1,6 +1,6 @@
-import { Sala } from "../interfaces/ISala";
+import { ISala } from "../interfaces/ISala";
 
-export class Laboratorio implements Sala {
+export class Laboratorio implements ISala {
   id: number;
   numero: number;
   capacidadeMaxima: number;
