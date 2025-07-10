@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Sala } from "../types";
-import { getSalas, addSala } from "../service/api";
+import { addSala, getSalas } from "../service/api";
 
 // HOOK PERSONALIZADO PARA GERENCIAR AS SALAS DO SISTEMA
 export function useSalas() {

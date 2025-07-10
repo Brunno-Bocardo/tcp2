@@ -163,4 +163,8 @@ export class ReservaService {
             resolve(reservas)
         });
     }
+    async listarTodasAsReservas(): Promise<Reserva[]> {
+        const reservas = await this.reservaRepository.listarReservas();
+        return reservas;
+    }
 }

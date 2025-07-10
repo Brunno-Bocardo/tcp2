@@ -37,3 +37,8 @@ export interface ReservaBackend {
     hora_fim: string;
     descricao?: string;
 }
+
+export type Notification = {
+    message: string;
+    type: 'success' | 'error';
+} | null;

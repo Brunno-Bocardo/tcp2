@@ -14,7 +14,9 @@ interface Props {
 const DashboardCoordenador: React.FC<Props> = ({
     users,
     salas,
+    reservas,
     onAddSala,
+
 }) => {
     // ESTADO PARA ARMAZENAR OS DADOS DA NOVA SALA A SER ADICIONADA
     const [novaSala, setNovaSala] = useState<Omit<Sala, "id">>({
@@ -120,7 +122,7 @@ const DashboardCoordenador: React.FC<Props> = ({
             </div>
 
             {/* AQUI DEVE SER ADICIONADA A SECAO DE EDITAR RESERVA, FAZER RESERVA E LISTAR RESERVAS */}
-            <TabelaLogs users={users} />
+            <TabelaLogs users={users} reservas={reservas} />
         </section>
     );
 };

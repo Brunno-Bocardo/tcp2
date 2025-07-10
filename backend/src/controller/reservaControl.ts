@@ -94,3 +94,13 @@ export async function verificarReservas(req: Request, res: Response) {
         res.status(500).json({ error: "Erro ao buscar reservas" })
     }
 }
+export async function listarTodasAsReservas(req: Request, res: Response) {
+    try {
+        const todasAsReservas = await reservaService.listarTodasAsReservas();
+
+        res.status(200).json(todasAsReservas);
+
+    } catch (error: any) {
+        res.status(500).json({ message: error.message });
+    }
+}

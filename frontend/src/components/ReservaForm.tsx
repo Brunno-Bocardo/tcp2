@@ -19,7 +19,8 @@ interface Props {
     horarioFim: string;
     setHorarioFim: (h: string) => void;
     horariosDisponiveis: string[];
-    estaDisponivel: (h: string) => boolean;
+    isStartTimeAvailable: (h: string) => boolean
+    isEndTimeAvailable: (h: string) => boolean;
     adicionarReserva: () => void;
 }
 
@@ -40,7 +41,7 @@ const ReservaForm: React.FC<Props> = ({
     horarioFim,
     setHorarioFim,
     horariosDisponiveis,
-    estaDisponivel,
+    isStartTimeAvailable,
     adicionarReserva,
 }) => {
     return (
@@ -127,7 +128,7 @@ const ReservaForm: React.FC<Props> = ({
                         horarios={horariosDisponiveis}
                         horarioSelecionado={horarioInicio}
                         setHorarioSelecionado={setHorarioInicio}
-                        horarioDisponivel={estaDisponivel}
+                        horarioDisponivel={isStartTimeAvailable}
                         disabled={!salaSelecionada || !dataDaReserva}
 
                     />
@@ -136,7 +137,7 @@ const ReservaForm: React.FC<Props> = ({
                         horarios={horariosDisponiveis}
                         horarioSelecionado={horarioFim}
                         setHorarioSelecionado={setHorarioFim}
-                        horarioDisponivel={estaDisponivel}
+                        horarioDisponivel={isStartTimeAvailable}
                         filtroMinimo={horarioInicio}
                         disabled={!horarioInicio}
                     />

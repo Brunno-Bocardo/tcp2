@@ -3,7 +3,7 @@ import React, { useState, useEffect, useMemo } from "react";
 import { useUsers } from "../hooks/useUsers";
 import { useSalas } from "../hooks/useSalas";
 import { useReserva } from "../hooks/useReserva";
-import { User, Sala, Reserva } from "../types";
+import { User, Sala, Reserva, Notification } from "../types";
 
 import ReservaForm from "../components/ReservaForm";
 import ListaDeReservas from "../components/ListaDeReservas";
@@ -23,7 +23,6 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
 
   const { users, usuarioLogado, tipoUsuario } = useUsers(nomeUsuario);
   const { salas, loading: loadingSalas, error: errorSalas, criarSala } = useSalas();
-
   const [aba, setAba] = useState<'novaReserva' | 'minhasReservas' | 'dashboard'>('novaReserva');
   const [usuarioSelecionado, setUsuarioSelecionado] = useState<number | null>(null);
   const [salaSelecionada, setSalaSelecionada] = useState<number | null>(null);
@@ -32,6 +31,16 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
   const [horarioFim, setHorarioFim] = useState("");
   const [refreshKey, setRefreshKey] = useState(0);
   const { reservas, criarReserva, error: errorReservas } = useReserva(salaSelecionada ?? undefined, dataReserva);
+  const [notification, setNotification] = useState<Notification>(null);
+
+  useEffect(() => {
+    if (notification) {
+      const timer = setTimeout(() => {
+        setNotification(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [notification]);
 
   useEffect(() => {
     if (tipoUsuario && tipoUsuario !== "Coordenador" && usuarioLogado) {
@@ -40,27 +49,37 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
   }, [tipoUsuario, usuarioLogado]);
 
   const horariosOcupados = useMemo(() => {
+    console.log("Processando estas reservas:", reservas);
     return reservas.flatMap(r => {
-      const inicio = horariosDisponiveis.indexOf(r.horarioInicio);
-      const fim = horariosDisponiveis.indexOf(r.horarioFim);
+      const inicioStr = r.horarioInicio.slice(0, 5);
+      const fimStr = r.horarioFim.slice(0, 5);
+      const inicio = horariosDisponiveis.indexOf(inicioStr);
+      const fim = horariosDisponiveis.indexOf(fimStr);
       if (inicio === -1 || fim === -1) return [];
       return horariosDisponiveis.slice(inicio, fim);
     });
   }, [reservas]);
 
-  const estaDisponivel = (h: string) => !horariosOcupados.includes(h);
+  const reservationStartTimes = useMemo(() =>
+    new Set(reservas.map(r => r.horarioInicio)),
+    [reservas]
+  );
+  const isStartTimeAvailable = (h: string) => !horariosOcupados.includes(h);
 
+  const isEndTimeAvailable = (h: string) => {
+    return !horariosOcupados.includes(h) || reservationStartTimes.has(h);
+  };
   const handleAdicionarReserva = async () => {
     if (!usuarioLogado) {
-      alert("Erro: Usuário não logado.");
+      setNotification({ message: "Erro: Usuário não logado.", type: 'error' });
       return;
     }
     if (!salaSelecionada || !usuarioSelecionado || !dataReserva || !horarioInicio || !horarioFim) {
-      alert("Por favor, preencha todos os campos.");
+      setNotification({ message: "Por favor, preencha todos os campos.", type: 'error' });
       return;
     }
     if (horarioFim <= horarioInicio) {
-      alert("O horário final deve ser posterior ao inicial.");
+      setNotification({ message: "O horário final deve ser posterior ao inicial.", type: 'error' });
       return;
     }
 
@@ -73,16 +92,17 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
       horarioInicio,
       horarioFim,
     };
+
     const sucesso = await criarReserva(novaReserva as Omit<Reserva, 'id'>);
 
     if (sucesso) {
-      alert("Reserva criada com sucesso!");
+      setNotification({ message: "Reserva criada com sucesso!", type: 'success' });
       setDataReserva("");
       setHorarioInicio("");
       setHorarioFim("");
       setRefreshKey(prevKey => prevKey + 1);
     } else {
-      alert("Falha ao criar a reserva. Verifique os dados ou o erro no console.");
+      setNotification({ message: errorReservas || "Falha ao criar a reserva.", type: 'error' });
     }
   };
 
@@ -90,6 +110,13 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
 
   return (
     <div className="min-h-screen bg-[#1e1e2f] text-[#e0e0e0] p-8 font-sans">
+      {notification && (
+        <div
+          className={`fixed top-5 right-5 p-4 rounded-lg shadow-lg text-white font-semibold z-50 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
+        >
+          {notification.message}
+        </div>
+      )}
       <header className="text-center mb-10">
         <h1 className="text-5xl font-extrabold tracking-wide">SISTEMA DE RESERVAS</h1>
         {usuarioLogado ? (
@@ -144,8 +171,9 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
             horarioFim={horarioFim}
             setHorarioFim={setHorarioFim}
             horariosDisponiveis={horariosDisponiveis}
-            estaDisponivel={estaDisponivel}
             adicionarReserva={handleAdicionarReserva}
+            isStartTimeAvailable={isStartTimeAvailable}
+            isEndTimeAvailable={isEndTimeAvailable}
           />
         )}
 
@@ -153,7 +181,9 @@ const ReservasPage: React.FC<ReservasPageProps> = ({ nomeUsuario }) => {
           <ListaDeReservas
             usuarioLogado={usuarioLogado}
             salas={salas}
-            refreshKey={refreshKey} />
+            refreshKey={refreshKey}
+            users={users}
+          />
         )}
 
         {aba === 'dashboard' && tipoUsuario === "Coordenador" && (

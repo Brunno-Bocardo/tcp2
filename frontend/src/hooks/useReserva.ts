@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import { Reserva } from "../types";
-import { getReservas, addReserva } from "../service/api";
+import { addReserva, getReservas } from "../service/api";
 
 const mapApiDataToReserva = (apiData: any): Reserva => ({
     id: apiData.id,
@@ -9,10 +9,18 @@ const mapApiDataToReserva = (apiData: any): Reserva => ({
     salaId: apiData.sala_id,
     dataSolicitacao: apiData.data_da_solicitacao,
     dataReserva: apiData.data_da_reserva,
-    horarioInicio: apiData.horario_inicio,
-    horarioFim: apiData.horario_fim,
+    horarioInicio: apiData.horario_de_inicio,
+    horarioFim: apiData.horario_de_fim,
 });
-
+const mapReservaToApiData = (reserva: Omit<Reserva, 'id'>) => ({
+    solicitante_id: reserva.solicitanteId,
+    user_id: reserva.userId,
+    sala_id: reserva.salaId,
+    data_da_solicitacao: reserva.dataSolicitacao,
+    data_da_reserva: reserva.dataReserva,
+    horario_inicio: reserva.horarioInicio,
+    horario_fim: reserva.horarioFim,
+});
 
 export function useReserva(salaId?: number | string, dataReserva?: string) {
     const [reservas, setReservas] = useState<Reserva[]>([]);
@@ -29,37 +37,38 @@ export function useReserva(salaId?: number | string, dataReserva?: string) {
         setError(null);
         try {
             const data = await getReservas(salaId, dataReserva);
-            if (data && Array.isArray(data)) {
-                const reservasConvertidas = data.map(mapApiDataToReserva);
-                setReservas(reservasConvertidas);
-            } else {
-                setReservas([]);
-            }
+            const reservasConvertidas = Array.isArray(data) ? data.map(mapApiDataToReserva) : [];
+            setReservas(reservasConvertidas);
         } catch (err: any) {
             setError(err.message || "Erro ao carregar reservas");
         } finally {
             setLoading(false);
         }
-    }, [salaId, dataReserva])
+    }, [salaId, dataReserva]);
 
     useEffect(() => {
         fetchReservas();
     }, [fetchReservas]);
 
-    async function criarReserva(reserva: Omit<Reserva, 'id'>) {
+    const criarReserva = useCallback(async (reserva: Omit<Reserva, 'id'>) => {
         try {
-            const novaReservaApi = await addReserva(reserva as Reserva);
-            const novaReservaFormatada = mapApiDataToReserva(novaReservaApi);
+            const dadosParaApi = mapReservaToApiData(reserva);
+            const novaReservaApi = await addReserva(dadosParaApi);
+            const novaReservaFormatada = novaReservaApi.reserva as Reserva;
+
+            if (!novaReservaFormatada) {
+                throw new Error("A resposta da API após a criação não continha o objeto da reserva.");
+            }
 
             setReservas((prevReservas) => [...prevReservas, novaReservaFormatada]);
-
             return true;
+
         } catch (err: any) {
             setError(err.message || "Erro ao criar reserva");
             console.error("Erro ao criar reserva:", err);
             return false;
         }
-    }
+    }, []);
 
     return { reservas, loading, error, criarReserva, refetchReservas: fetchReservas };
 }

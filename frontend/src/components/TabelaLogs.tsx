@@ -1,8 +1,13 @@
 // src/components/TabelaLogs.tsx
-import React, { useEffect, useState } from "react";
-import { User } from "../types";
+import React, { useEffect, useMemo, useState } from "react";
+import { Reserva, User } from "../types";
 
-const TabelaLogs: React.FC<{ users?: User[] }> = ({ users = [] }) => {
+interface TabelaLogsProps {
+    users?: User[];
+    reservas?: Reserva[];
+}
+
+const TabelaLogs: React.FC<TabelaLogsProps> = ({ users = [], reservas = [] }) => {
     const [logs, setLogs] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [eventoFiltro, setEventoFiltro] = useState<string>("");
@@ -24,21 +29,28 @@ const TabelaLogs: React.FC<{ users?: User[] }> = ({ users = [] }) => {
         }
         fetchLogs();
     }, []);
+    const parseReservaId = (descricao: string): number | null => {
+        const match = descricao.match(/(?:id:?|id)\s*(\d+)/i);
+        return match ? parseInt(match[1], 10) : null;
+    };
+    const reservasMap = useMemo(() =>
+        new Map(reservas.map(r => [r.id, r])),
+        [reservas]
+    );
+
+    const getNomeUsuario = (usuario_id: number | null): string => {
+        if (!usuario_id) return "-";
+        const user = users.find(u => u.id === usuario_id);
+        return user ? user.nome : String(usuario_id);
+    };
 
     const eventosUnicos = Array.from(new Set(logs.map(l => l.evento).filter(Boolean)));
     const usuariosUnicos = Array.from(new Set(logs.map(l => l.usuario_id).filter(Boolean)));
-
     const logsFiltrados = logs.filter(log => {
         const eventoOk = eventoFiltro ? log.evento === eventoFiltro : true;
         const usuarioOk = usuarioFiltro ? String(log.usuario_id) === usuarioFiltro : true;
         return eventoOk && usuarioOk;
     });
-
-    const getNomeUsuario = (usuario_id: number | null) => {
-        if (!usuario_id) return "-";
-        const user = users.find(u => u.id === usuario_id);
-        return user ? user.nome : usuario_id;
-    };
 
     return (
         <section className="mt-10">

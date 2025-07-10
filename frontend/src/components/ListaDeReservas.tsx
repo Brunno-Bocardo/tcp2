@@ -1,34 +1,54 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { Reserva, User, Sala } from '../types';
-import { listarReservasDoUsuarioAPI, cancelarReservaAPI } from '../service/api';
+import { Reserva, User, Sala, Notification } from '../types';
 import { parse, format, isValid, startOfToday } from 'date-fns';
+import { cancelarReservaAPI, getAllReservasAPI } from '../service/api';
 
 interface ListaDeReservasProps {
     usuarioLogado: User | null;
     salas: Sala[];
     refreshKey: number;
+    users: User[];
 }
 
-const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas, refreshKey }) => {
+const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas, refreshKey, users }) => {
     const [minhasReservas, setMinhasReservas] = useState<Reserva[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [reservaParaCancelar, setReservaParaCancelar] = useState<number | null>(null);
+    const [notification, setNotification] = useState<Notification>(null);
+
+    useEffect(() => {
+        if (notification) {
+            const timer = setTimeout(() => {
+                setNotification(null);
+            }, 3000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [notification]);
 
     useEffect(() => {
         if (usuarioLogado) {
-            const fetchReservas = async () => {
+            const fetchEFiltrarReservas = async () => {
                 setIsLoading(true);
                 setError(null);
                 try {
-                    const data = await listarReservasDoUsuarioAPI(usuarioLogado.id);
-                    setMinhasReservas(data);
+                    const todasAsReservas = await getAllReservasAPI();
+
+                    const reservasDoUsuario = todasAsReservas.filter(reserva =>
+                        reserva.solicitanteId === usuarioLogado.id || reserva.userId === usuarioLogado.id
+                    );
+
+                    setMinhasReservas(reservasDoUsuario);
+
                 } catch (err: any) {
                     setError(err.message);
                 } finally {
                     setIsLoading(false);
                 }
             };
-            fetchReservas();
+
+            fetchEFiltrarReservas();
         } else {
             setIsLoading(false);
             setMinhasReservas([]);
@@ -56,29 +76,33 @@ const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas,
         return { reservasFuturas: futuras, reservasPassadas: passadas.reverse() };
     }, [minhasReservas]);
 
+    const getNomeUsuario = (userId: number): string => {
+        const user = users.find(u => u.id === userId);
+        return user ? user.nome : `Usuário ID ${userId}`;
+    };
 
-    const handleCancelarClick = async (id: number) => {
-        if (!usuarioLogado) {
-            alert("Você precisa estar logado para cancelar uma reserva.");
-            return;
-        }
-        console.log(`Tentando cancelar reserva com ID: ${id}`);
-        if (window.confirm("Tem certeza que deseja cancelar esta reserva?")) {
-            try {
-                await cancelarReservaAPI(id);
-                alert("Reserva cancelada com sucesso!");
 
-                setMinhasReservas(prevReservas => prevReservas.filter(r => r.id !== id));
-            } catch (err: any) {
-                alert(`Erro ao cancelar a reserva: ${err.message}`);
-            }
+    const handleConfirmarCancelamento = async () => {
+        if (!reservaParaCancelar) return;
+
+        try {
+            await cancelarReservaAPI(reservaParaCancelar);
+            setNotification({ message: 'Reserva cancelada com sucesso!', type: 'success' });
+            setMinhasReservas(prev => prev.filter(r => r.id !== reservaParaCancelar));
+        } catch (err: any) {
+            setNotification({ message: `Erro ao cancelar: ${err.message}`, type: 'error' });
+        } finally {
+            setReservaParaCancelar(null);
         }
     };
 
-    const handleEditarClick = (reserva: Reserva) => {
-        alert(`Funcionalidade de editar a reserva ${reserva.id} ainda não implementada.`);
-    };
+    // const handleEditarClick = (reserva: Reserva) => {
+    //     alert(`Funcionalidade de editar a reserva ${reserva.id} ainda não implementada.`);
+    // };
 
+    const handleCancelarClick = (id: number) => setReservaParaCancelar(id);
+
+    const handleVoltar = () => setReservaParaCancelar(null);
     if (isLoading) {
         return <p className="text-center text-gray-400 mt-10">Carregando suas reservas...</p>;
     }
@@ -89,6 +113,13 @@ const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas,
 
     return (
         <div className="space-y-10">
+            {notification && (
+                <div
+                    className={`fixed top-5 right-5 p-4 rounded-lg shadow-lg text-white font-semibold z-50 ${notification.type === 'success' ? 'bg-green-500' : 'bg-red-500'}`}
+                >
+                    {notification.message}
+                </div>
+            )}
             <section className="bg-[#2a2a40] rounded-xl p-8 shadow-lg max-w-4xl mx-auto">
                 <h2 className="text-2xl font-semibold mb-6 border-b border-[#80cbc4] pb-2 text-white">Próximas Reservas</h2>
                 {reservasFuturas.length > 0 ? (
@@ -96,23 +127,44 @@ const ListaDeReservas: React.FC<ListaDeReservasProps> = ({ usuarioLogado, salas,
                         {reservasFuturas.map((reserva) => {
                             const salaInfo = salas.find(s => s.id === reserva.salaId);
                             const dataFormatada = format(parse(reserva.dataReserva, 'yyyy-MM-dd', new Date()), 'dd/MM/yyyy');
+                            const feitaParaOutro = usuarioLogado && reserva.userId !== usuarioLogado.id;
+                            const isConfirmando = reservaParaCancelar === reserva.id;
+
                             return (
                                 <li key={reserva.id} className="bg-[#44475a] p-4 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
                                     <div>
                                         <p className="font-bold text-white">
                                             Sala: {salaInfo ? `${salaInfo.numero} (${salaInfo.tipo})` : `ID ${reserva.salaId}`}
                                         </p>
-                                        <p className="text-sm text-gray-300">
+
+                                        {feitaParaOutro && (
+                                            <p className="text-sm font-semibold text-yellow-400 mt-1">
+                                                Para: {getNomeUsuario(reserva.userId)}
+                                            </p>
+                                        )}
+
+                                        <p className="text-sm text-gray-300 mt-1">
                                             Data: {dataFormatada} | Horário: {reserva.horarioInicio} - {reserva.horarioFim}
                                         </p>
+                                        {isConfirmando && (
+                                            <p className="text-red-700 font-bold mt-2 animate-pulse">Tem certeza?</p>
+                                        )}
                                     </div>
                                     <div className="flex gap-2 self-end sm:self-center">
-                                        <button onClick={() => handleEditarClick(reserva)} className="w-full py-3 bg-[#80cbc4] text-[#1e1e2f] rounded hover:bg-[#00acc1] transition-colors">
-                                            Editar
-                                        </button>
-                                        <button onClick={() => handleCancelarClick(reserva.id)} className="w-full py-3 bg-red-700  text-[#1e1e2f] rounded hover:bg-red-500 transition-colors">
-                                            Cancelar
-                                        </button>
+                                        {isConfirmando ? (
+                                            <>
+                                                <button onClick={handleConfirmarCancelamento} className="py-2 px-4 bg-red-700 text-white rounded hover:bg-red-500 transition-colors font-semibold">
+                                                    Sim, cancelar
+                                                </button>
+                                                <button onClick={handleVoltar} className="py-2 px-4 bg-gray-500 text-white rounded hover:bg-gray-400 transition-colors">
+                                                    Voltar
+                                                </button>
+                                            </>
+                                        ) : (
+                                            <button onClick={() => handleCancelarClick(reserva.id)} className="py-2 px-4 bg-red-700 text-white rounded hover:bg-red-500 transition-colors">
+                                                Cancelar
+                                            </button>
+                                        )}
                                     </div>
                                 </li>
                             );
