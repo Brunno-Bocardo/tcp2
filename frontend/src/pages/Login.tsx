@@ -91,7 +91,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                         Entrar
                     </button>
 
-                    <div className="text-sm text-center text-[#a0a0a0] pt-2 space-y-2">
+                    {/* <div className="text-sm text-center text-[#a0a0a0] pt-2 space-y-2">
                         <p>
                             <a
                                 href="#"
@@ -111,7 +111,7 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
                                 Cadastre-se
                             </a>
                         </p>
-                    </div>
+                    </div> */}
                 </form>
             </div>
         </div>
