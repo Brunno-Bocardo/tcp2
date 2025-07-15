@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { Sala } from "../types";
-import { getSalas, addSala } from "../service/api";
+import { addSala, getSalas } from "../service/api";
 
 // HOOK PERSONALIZADO PARA GERENCIAR AS SALAS DO SISTEMA
 export function useSalas() {
@@ -22,7 +22,7 @@ export function useSalas() {
 
             try {
                 const data = await getSalas(); // PEGA A LISTA DE SALAS DA API
-                setSalas(data); // SALVA A LISTA NO ESTADO
+                setSalas(data.salas); // SALVA A LISTA NO ESTADO
             } catch (err) {
                 setError("Erro ao carregar salas"); // MOSTRA ERRO SE DER RUIM
             } finally {
@@ -40,7 +40,7 @@ export function useSalas() {
 
             // APOS ADICIONAR, BUSCA A LISTA ATUALIZADA DE NOVO
             const data = await getSalas();
-            setSalas(data); // ATUALIZA O ESTADO COM A NOVA LISTA
+            setSalas(data.salas); // ATUALIZA O ESTADO COM A NOVA LISTA
             return true; // RETORNA TRUE PRA DIZER QUE DEU CERTO
         } catch (err) {
             setError("Erro ao criar sala"); // MOSTRA ERRO SE DER RUIM

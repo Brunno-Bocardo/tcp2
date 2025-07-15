@@ -90,9 +90,9 @@ async function inicializarUsuariosPadrao() {
     const professorFactory = new ProfessorFactory();
     const coordenadorFactory = new CoordenadorFactory();
     const usuarios_padrao = [
-        professorFactory.criarUsuario("Andriel", "andriel@gmail.com", "Redes", "1234"),
-        professorFactory.criarUsuario("Brunno", "brunno@gmail.com", "Estrutura de Dados", "1234"),
-        coordenadorFactory.criarUsuario("Flavia", "flavia@gmail.com", "Banco de Dados", "1234")
+        professorFactory.criarUsuario("Andriel", "andriel@gmail.com", "Redes", "123456"),
+        professorFactory.criarUsuario("Brunno", "brunno@gmail.com", "Estrutura de Dados", "123456"),
+        coordenadorFactory.criarUsuario("Flavia", "flavia@gmail.com", "Banco de Dados", "123456")
     ];
     
     // Inserir usuários no banco

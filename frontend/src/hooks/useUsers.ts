@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { User } from "../types";
-import { getUsers, addUser } from "../service/api";
+import { addUser, getUsers } from "../service/api";
 
 // HOOK PRA GERENCIAR OS USUARIOS DO SISTEMA E IDENTIFICAR O USUARIO LOGADO
 export function useUsers(emailUsuario?: string) {

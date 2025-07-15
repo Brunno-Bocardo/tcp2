@@ -1,76 +1,74 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { Reserva } from "../types";
-import { getReservas, addReserva } from "../service/api";
+import { addReserva, getReservas } from "../service/api";
 
-// HOOK PERSONALIZADO PARA GERENCIAR RESERVAS
-export function useReserva() {
-    // LISTA DE RESERVAS QUE VAI SER EXIBIDA
+const mapApiDataToReserva = (apiData: any): Reserva => ({
+    id: apiData.id,
+    solicitanteId: apiData.solicitante_id,
+    userId: apiData.user_id,
+    salaId: apiData.sala_id,
+    dataSolicitacao: apiData.data_da_solicitacao,
+    dataReserva: apiData.data_da_reserva,
+    horarioInicio: apiData.horario_de_inicio,
+    horarioFim: apiData.horario_de_fim,
+});
+const mapReservaToApiData = (reserva: Omit<Reserva, 'id'>) => ({
+    solicitante_id: reserva.solicitanteId,
+    user_id: reserva.userId,
+    sala_id: reserva.salaId,
+    data_da_solicitacao: reserva.dataSolicitacao,
+    data_da_reserva: reserva.dataReserva,
+    horario_inicio: reserva.horarioInicio,
+    horario_fim: reserva.horarioFim,
+});
+
+export function useReserva(salaId?: number | string, dataReserva?: string) {
     const [reservas, setReservas] = useState<Reserva[]>([]);
-
-    // INDICADOR DE CARREGAMENTO (TRUE QUANDO TIVER BUSCANDO DADOS)
-    const [loading, setLoading] = useState<boolean>(true);
-
-    // ERRO CASO ACONTECA ALGUMA FALHA NA REQUISICAO
+    const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
 
-    // USA O USEEFFECT PRA CARREGAR AS RESERVAS QUANDO O COMPONENTE MONTAR
-    useEffect(() => {
-        async function fetchReservas() {
-            setLoading(true); // COMECA A MOSTRAR QUE TA CARREGANDO
-            setError(null); // LIMPA ERRO ANTES DE TENTAR NOVAMENTE
-
-            try {
-                const data = await getReservas(); // CHAMA A API PRA PEGAR RESERVAS
-                // Converte os campos snake_case para camelCase
-                const reservasConvertidas = data.map((r: any) => ({
-                    ...r,
-                    userId: r.user_id,
-                    salaId: r.sala_id,
-                    dataDaReserva: r.data_da_reserva,
-                    horarioInicio: r.r.horario_inicio,
-                    horarioFim: r.horario_fim,
-                }));
-                setReservas(reservasConvertidas); // SALVA OS DADOS NO ESTADO
-            } catch (err) {
-                setError("Erro ao carregar reservas"); // SE DER ERRO MOSTRA A MENSAGEM
-            } finally {
-                setLoading(false); // PARA DE MOSTRAR O CARREGANDO
-            }
+    const fetchReservas = useCallback(async () => {
+        if (!salaId || !dataReserva) {
+            setReservas([]);
+            return;
         }
 
-        fetchReservas(); // CHAMA A FUNCAO ASSIM QUE O COMPONENTE MONTAR
+        setLoading(true);
+        setError(null);
+        try {
+            const data = await getReservas(salaId, dataReserva);
+            const reservasConvertidas = Array.isArray(data) ? data.map(mapApiDataToReserva) : [];
+            setReservas(reservasConvertidas);
+        } catch (err: any) {
+            setError(err.message || "Erro ao carregar reservas");
+        } finally {
+            setLoading(false);
+        }
+    }, [salaId, dataReserva]);
+
+    useEffect(() => {
+        fetchReservas();
+    }, [fetchReservas]);
+
+    const criarReserva = useCallback(async (reserva: Omit<Reserva, 'id'>) => {
+        try {
+            const dadosParaApi = mapReservaToApiData(reserva);
+            const novaReservaApi = await addReserva(dadosParaApi);
+            const novaReservaFormatada = novaReservaApi.reserva as Reserva;
+
+            if (!novaReservaFormatada) {
+                throw new Error("A resposta da API após a criação não continha o objeto da reserva.");
+            }
+
+            setReservas((prevReservas) => [...prevReservas, novaReservaFormatada]);
+            return true;
+
+        } catch (err: any) {
+            setError(err.message || "Erro ao criar reserva");
+            console.error("Erro ao criar reserva:", err);
+            return false;
+        }
     }, []);
 
-    // FUNCAO PARA CRIAR UMA NOVA RESERVA
-    async function criarReserva(reserva: Reserva) {
-        try {
-            const resposta = await addReserva(reserva); // CHAMA A API PRA ADICIONAR A RESERVA
-
-            // SE DER ALGUM ERRO NO BACKEND
-            if (resposta?.error || resposta?.status === "erro") {
-                setError(resposta?.message || "Erro ao criar reserva");
-                console.error("Erro do backend ao criar reserva:", resposta);
-                return false; // RETORNA FALSE PRA INDICAR QUE NAO DEU CERTO
-            }
-
-            // Atualiza as reservas convertendo os campos
-            const data = await getReservas();
-            const reservasConvertidas = data.map((r: any) => ({
-                ...r,
-                userId: r.user_id,
-                salaId: r.sala_id,
-                dataDaReserva: r.data_da_reserva,
-                horarioInicio: r.horario_inicio,
-                horarioFim: r.horario_fim,
-            }));
-            setReservas(reservasConvertidas); // ATUALIZA A LISTA COM A NOVA RESERVA
-            return true; // TRUE SIGNIFICANDO QUE FUNCIONOU
-        } catch (err: any) {
-            setError("Erro ao criar reserva"); // MSG DE ERRO
-            console.error("Erro ao criar reserva:", err);
-            return false; // TAMBEM RETORNA FALSE
-        }
-    }
-
-    return { reservas, loading, error, criarReserva };
+    return { reservas, loading, error, criarReserva, refetchReservas: fetchReservas };
 }

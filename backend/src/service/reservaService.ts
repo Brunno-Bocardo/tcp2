@@ -1,38 +1,36 @@
-import { EventEmitterAsyncResource } from "node:stream";
 import { Reserva } from "../model/classes/Reserva";
 import { ReservaRepository } from "../repository/reservaRepository";
-import { UserRepository } from "../repository/userRepository";
-import { SalaRepository } from "../repository/salaRepository";
+import { CriadorReserva } from "../patterns/methodFactory/criadorReserva";
+import { UserValidator } from "../patterns/chainOfResponsibility/UserValidator";
+import { SalaValidator } from "../patterns/chainOfResponsibility/SalaValidator";
+import { CampoValidator } from "../patterns/chainOfResponsibility/CampoValidator";
 
 export class ReservaService {
     private reservaRepository = ReservaRepository.getInstance();
-    private userRepository = UserRepository.getInstance();
-    private salaRepository = SalaRepository.getInstance();
-    
+    private criadorReserva = new CriadorReserva(); // cria reservas
+    private validorCampos = new CampoValidator(); // valida os dados da reserva enviados
+    private validorUsuario = new UserValidator(); // valida se o usuario informado existe
+    private validorSala = new SalaValidator(); // valida se a sala informada existe
+
 
     async registrarReserva(reservaData: any): Promise<Reserva> {
-        const {solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
 
-        if(!solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
+        this.validorCampos.validate(reservaData)
+        await this.validorUsuario.validate(reservaData);
+        await this.validorSala.validate(reservaData);
+
+        const { sala_id, data_da_reserva, horario_inicio } = reservaData
+
+        const reservaDataTimeExiste = await this.reservaRepository.listarReservasPorSalaDataTime(sala_id, data_da_reserva, horario_inicio)
+
+        if (reservaDataTimeExiste) {
+            throw new Error(`Sala já reservada para data: ${data_da_reserva} no horario: ${horario_inicio}`)
         }
 
-        const user = await this.userRepository.filtraUsuarioById(userId);
-
-        if(!user){
-            throw new Error(`Usuário com ID ${userId} não encontrado.`);
-        }
-
-        const sala = await this.salaRepository.filtrarSalaById(salaId)
-
-        if(!sala){
-            throw new Error(`Sala com ID ${salaId} não encontrada`);
-        }
-
-        const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim, undefined, solicitanteId);
+        const reserva = this.criadorReserva.criarReserva(reservaData)
 
         const reservaRegistrada = await this.reservaRepository.inserirReserva(reserva);
-        console.log('Reserva registrada: ', reservaRegistrada); 
+        console.log('Reserva registrada: ', reservaRegistrada);
         return new Promise<Reserva>((resolve) => {
             resolve(reservaRegistrada);
         });
@@ -40,15 +38,14 @@ export class ReservaService {
 
     async filtrarReservaPorId(reservaId: string | any): Promise<Reserva> {
 
-        if(!reservaId) {
+        if (!reservaId) {
             throw new Error(`ID ${reservaId} inválido`);
         }
 
         const id = typeof reservaId === 'string' ? parseInt(reservaId) : reservaId;
-
         const reserva = await this.reservaRepository.filtrarReservaById(id);
 
-        if(!reserva){
+        if (!reserva) {
             throw new Error("Reserva não localizada");
         }
 
@@ -58,74 +55,92 @@ export class ReservaService {
         })
     }
 
-    async atualizarReserva(reservaData:any) {
-        const {id, solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
+    async filtrarReservasPorIdUser(solicitanteId: string): Promise<Reserva[]> {
 
-        if(!id || !solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
-            throw new Error("Dados da reserva incompletos")
+
+        if (!solicitanteId) {
+            throw new Error(`ID ${solicitanteId} inválido`);
         }
+
+        const id = typeof solicitanteId === 'string' ? parseInt(solicitanteId) : solicitanteId;
+
+        const reservas = await this.reservaRepository.filtrarReservasByIdUser(id);
+
+        if (!reservas) {
+            throw new Error("Reservas não localizadas");
+        }
+
+        console.log("Reservas encontradas com sucesso!");
+        return new Promise<Reserva[]>((resolve) => {
+            resolve(reservas);
+        })
+    }
+
+    async atualizarReserva(reservaData: any): Promise<Reserva> {
+        const { id } = reservaData;
+
+        if (!id) {
+            throw new Error("O ID da reserva não foi informado")
+        }
+
+        this.validorCampos.validate(reservaData)
+        await this.validorUsuario.validate(reservaData);
+        await this.validorSala.validate(reservaData);
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
 
-        if(!reservaExiste) {
+        if (!reservaExiste) {
             throw new Error(`Reserva com ID ${id} não encontrada`)
         }
 
-        const usuarioExiste = await this.userRepository.filtraUsuarioById(userId)
+        const reserva = this.criadorReserva.criarReserva(reservaData)
+        await this.reservaRepository.atualizarReserva(reserva);
 
-        if(!usuarioExiste) {
-            throw new Error(`Usuario com ID ${id} não encontrado`)
-        }
-
-        const salaExiste = await this.salaRepository.filtrarSalaById(parseInt(salaId))
-
-        if(!salaExiste) {
-            throw new Error(`Sala com ID ${id} não encontrado`)
-        }
-
-        const reserva = new Reserva(parseInt(userId), parseInt(salaId), dataSolicitacao, dataReserva, horarioInicio, horarioFim, parseInt(id), parseInt(solicitanteId));
-
-        const resposta = await this.reservaRepository.atualizarReserva(reserva);
-
-        if (resposta.affectedRows === 0) {
-            throw new Error("Reserva não encontrada ou já deletada.");
-        }
+        return reserva;
     }
 
     async deletarReserva(reservaData: any) {
-        const {id, solicitanteId, userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim} = reservaData;
+        const { id, solicitanteId } = reservaData;
 
-        if(!id || !solicitanteId || !userId || !salaId || !dataSolicitacao || !dataReserva || !horarioInicio || !horarioFim) {
+        if (!id) {
             throw new Error("Dados da reserva incompletos")
+        }
+
+        const usuarioExiste = await this.reservaRepository.filtrarReservasByIdUser(solicitanteId)
+
+        if (!usuarioExiste) {
+            throw new Error(`Usuario com id ${solicitanteId} não encontrado`)
         }
 
         const reservaExiste = await this.reservaRepository.filtrarReservaById(parseInt(id))
 
-        if(!reservaExiste) {
-            throw new Error(`Reserva com ID ${id} não encontrada`)
+        if (!reservaExiste) {
+            throw new Error(`Reserva com id ${id} não encontrada`)
         }
 
-        const reserva = new Reserva(userId, salaId, dataSolicitacao, dataReserva, horarioInicio, horarioFim, id, solicitanteId);
-
-        const resposta = await this.reservaRepository.deletarReserva(reserva);
+        const resposta = await this.reservaRepository.deletarReserva(parseInt(id));
 
         if (resposta.affectedRows === 0) {
             throw new Error("Reserva não encontrada ou já deletada.");
         }
 
-        console.log('Reserva Deletada com sucesso!'); 
+        console.log('Reserva Deletada com sucesso!');
     }
 
     async verificarReservas(reservaData: any): Promise<Reserva[]> {
-        const {salaId, data} = reservaData;
+        const { salaId, data, time } = reservaData;
 
-        if(!salaId || !data) {
+        if (!salaId || !data) {
             throw new Error("Dados da reserva incompletos");
         }
 
-        const reservas = await this.reservaRepository.listarReservasPorSalaEData(parseInt(salaId), data);
+        const reservas = await this.reservaRepository.listarReservasPorSalaDataTime(parseInt(salaId), data, time);
         return new Promise<Reserva[]>((resolve) => {
             resolve(reservas)
         });
+    }
+    async listarTodasAsReservas(): Promise<Reserva[]> {
+        const reservas = await this.reservaRepository.listarReservas();
+        return reservas;
     }
 }

@@ -10,7 +10,7 @@ export class ReservaRepository extends AbstractSubject {
   private constructor() {
     super();
     this.createTable();
-    
+
     // Adicionar o LoggerObserver como observador
     const logger = LoggerObserver.getInstance();
     this.attach(logger);
@@ -59,48 +59,58 @@ export class ReservaRepository extends AbstractSubject {
     `;
 
     try {
-        const resultado = await executarComandoSQL(query, [
-            reserva.solicitanteId,
-            reserva.userId,
-            reserva.salaId,
-            reserva.dataDaSolicitacao,
-            reserva.dataDaReserva,
-            reserva.horarioInicio,
-            reserva.horarioFim
-        ]);
-        console.log("Reserva inserida com sucesso");
-        reserva.id = resultado.insertId;
-        
-        // Notificar observadores sobre a criação da reserva
-        this.notify('criar_reserva', reserva, reserva.solicitanteId);
-        
-        return new Promise<Reserva>((resolve) => {
-            resolve(reserva);
-        })
+      const resultado = await executarComandoSQL(query, [
+        reserva.solicitanteId,
+        reserva.userId,
+        reserva.salaId,
+        reserva.dataDaSolicitacao,
+        reserva.dataDaReserva,
+        reserva.horarioInicio,
+        reserva.horarioFim
+      ]);
+      console.log("Reserva inserida com sucesso");
+      reserva.id = resultado.insertId;
+
+      // Notificar observadores sobre a criação da reserva
+      this.notify('criar_reserva', reserva, reserva.solicitanteId);
+      return reserva;
+
     } catch (err: any) {
-        console.error("Erro ao cadastrar reserva:", err);
-        
-        // Notificar observadores sobre o erro
-        this.notify('erro_criar_reserva', {
-            ...reserva,
-            erro: err.message
-        }, reserva.userId);
-        
-        throw err;
+      console.error("Erro ao cadastrar reserva:", err);
+
+      // Notificar observadores sobre o erro
+      this.notify('erro_criar_reserva', {
+        ...reserva,
+        erro: err.message
+      }, reserva.userId);
+
+      throw err;
     }
   }
 
   async filtrarReservaById(reservaId: number): Promise<Reserva> {
     const query = "SELECT * FROM Reservations where id = ?";
 
-    try{
-        const resultado = await executarComandoSQL(query, [reservaId]);
-        return resultado[0]
+    try {
+      const resultado = await executarComandoSQL(query, [reservaId]);
+      return resultado[0]
     } catch (err: any) {
-        console.log("Erro ao filtrar reserva: ", err);
-        throw err;
+      console.log("Erro ao filtrar reserva: ", err);
+      throw err;
     }
 
+  }
+
+  async filtrarReservasByIdUser(solicitanteId: any): Promise<Reserva[]> {
+    const query = `SELECT * FROM Reservations where solicitante_id = ${solicitanteId}`;
+
+    try {
+      const resultado = await executarComandoSQL(query, []);
+      return resultado
+    } catch (err: any) {
+      console.log("Erro ao filtrar reserva: ", err);
+      throw err;
+    }
   }
 
   async atualizarReserva(reserva: Reserva): Promise<any> {
@@ -110,33 +120,33 @@ export class ReservaRepository extends AbstractSubject {
       const resultado = await executarComandoSQL(query, [reserva.userId, reserva.salaId, reserva.dataDaSolicitacao, reserva.dataDaReserva, reserva.horarioInicio, reserva.horarioFim, reserva.id])
       console.log(`Reserva com ID ${reserva.id} atualizada com sucesso`);
       return resultado;
-    } catch (erro: any){
+    } catch (erro: any) {
       console.log(`Erro ao tentar atualizar reserva com ID ${reserva.id}`)
       throw erro;
     }
   }
 
-  async deletarReserva(reserva: Reserva): Promise<any> {
+  async deletarReserva(id: number): Promise<any> {
     const query = `DELETE FROM Reservations where id = ?`
 
     try {
-      const resultado = await executarComandoSQL(query, [reserva.id]);
-      console.log(`Reserva com ID ${reserva.id} deletada com sucesso`);
+      const resultado = await executarComandoSQL(query, [id]);
+      console.log(`Reserva com ID ${id} deletada com sucesso`);
       return new Promise<any>((resolve) => {
         resolve(resultado);
       })
     } catch (erro: any) {
-      console.log(`Erro ao deletar reserva com ID ${reserva.id}`);
+      console.log(`Erro ao deletar reserva com ID ${id}`);
       throw erro;
     }
   }
 
-  async listarReservasPorSalaEData(salaId: number, data: string): Promise<Reserva[]> {
-    const query = "SELECT * FROM tcp2_db.Reservations WHERE sala_id = ? AND data_da_reserva = ?";
+  async listarReservasPorSalaDataTime(salaId: number, data: string, time: string): Promise<Reserva[]> {
+    const query = "SELECT * FROM tcp2_db.Reservations WHERE sala_id = ? AND data_da_reserva = ? AND horario_de_inicio = ?";
     try {
-      const resultado = await executarComandoSQL(query, [salaId, data]);
+      const resultado = await executarComandoSQL(query, [salaId, data, time]);
       return new Promise<Reserva[]>((resolve) => {
-        resolve(resultado);
+        resolve(resultado[0]);
       })
     } catch (err: any) {
       console.error("Erro ao listar reservas por sala e data");

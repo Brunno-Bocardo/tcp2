@@ -1,4 +1,5 @@
-import { Sala } from "../model/interfaces/ISala";
+import { ISala } from "../model/interfaces/ISala";
+import { CampoValidator } from "../patterns/chainOfResponsibility/CampoValidator";
 import { CriadorAuditorio } from "../patterns/methodFactory/criadorAuditorio";
 import { CriadorLaboratorio } from "../patterns/methodFactory/criadorLaboratorio";
 import { CriadorSalaDeAula } from "../patterns/methodFactory/criadorSalaDeAula";
@@ -9,15 +10,16 @@ export class SalaService {
     private CriadorAuditorio = new CriadorAuditorio();
     private CriadorLaboratorio = new CriadorLaboratorio();
     private CriadorSalaDeAula = new CriadorSalaDeAula();
+    private validorCampos = new CampoValidator();
+  
 
-    async cadastrarSala(salaData: any): Promise<Sala> {
+    async cadastrarSala(salaData: any): Promise<ISala> {
+        
+        this.validorCampos.validate(salaData)
+
         const {numero, capacidadeMaxima, tipo} = salaData;
 
-        if (!numero || !capacidadeMaxima || !tipo) {
-            throw new Error("Dados incompletos da sala");
-        }
-
-        let sala: Sala;
+        let sala: ISala;
 
         //method factory
         if(tipo === "Auditorio"){
@@ -32,12 +34,12 @@ export class SalaService {
         
         const salaRegistrada = await this.salaRepository.cadastrarSala(sala);
         console.log("Sala Cadastrada", salaRegistrada)
-        return new Promise<Sala>((resolve) => {
+        return new Promise<ISala>((resolve) => {
             resolve(salaRegistrada);
         });
     }
 
-    async filtrarSalaPorId(salaId: string): Promise<Sala>{
+    async filtrarSalaPorId(salaId: string): Promise<ISala>{
 
         if(!salaId){
             throw new Error(`ID ${salaId} inválido`)
@@ -52,16 +54,19 @@ export class SalaService {
         }
 
         console.log("Sala encontrada com sucesso");
-        return new Promise<Sala>((resolve) => {
+        return new Promise<ISala>((resolve) => {
             resolve(sala)
         });
     }
 
-    async atualizarSala(salaData: any): Promise<Sala>{
+    async atualizarSala(salaData: any): Promise<ISala>{
+
+        this.validorCampos.validate(salaData)
+
         const {salaId, numero, capacidadeMaxima, tipo} = salaData;
 
-        if (!salaId || !numero || !capacidadeMaxima || !tipo) {
-            throw new Error("Dados incompletos da sala");
+        if (!salaId) {
+            throw new Error("O ID da sala precisa ser informado");
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(salaId)
@@ -69,7 +74,7 @@ export class SalaService {
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
-        let sala: Sala;
+        let sala: ISala;
 
         //method factory
         if(tipo === "Auditorio"){
@@ -82,17 +87,20 @@ export class SalaService {
 
         await this.salaRepository.atualizarSala(sala);
         console.log("Sala atualizada");
-        return new Promise<Sala>((resolve) => {
+        return new Promise<ISala>((resolve) => {
             resolve(sala)
         });
     }
           
 
     async deletarSala(salaData:any) {
+
+        this.validorCampos.validate(salaData)
+
         const {salaId, numero, capacidadeMaxima, tipo} = salaData;
 
-        if (!salaId || !numero || !capacidadeMaxima || !tipo) {
-            throw new Error("Dados incompletos da sala");
+        if (!salaId) {
+            throw new Error("O ID da sala precisa ser informado");
         }
 
         const salaExiste = await this.salaRepository.filtrarSalaById(salaId)
@@ -100,7 +108,7 @@ export class SalaService {
             throw new Error(`Sala com ID ${salaId} não encontrada`);
         }
 
-        let sala: Sala;
+        let sala: ISala;
 
         //method factory
         if(tipo === "Auditorio"){
@@ -113,12 +121,12 @@ export class SalaService {
 
         await this.salaRepository.deletarSala(sala);
         console.log("Sala excluida");
-        return new Promise<Sala>((resolve) => {
+        return new Promise<ISala>((resolve) => {
             resolve(sala)
         });
     }
 
-    async filtrarSalas(): Promise<Sala[]> {
+    async filtrarSalas(): Promise<ISala[]> {
         const salas = await this.salaRepository.filtrarSalas();
         console.log("Salas filtradas", salas);
         return salas;

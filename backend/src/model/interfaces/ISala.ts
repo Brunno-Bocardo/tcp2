@@ -1,4 +1,4 @@
-export interface Sala {
+export interface ISala {
     id:number;
     numero:number;
     capacidadeMaxima:number;
